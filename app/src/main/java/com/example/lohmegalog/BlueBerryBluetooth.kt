@@ -93,14 +93,14 @@ class BlueBerryBluetooth private constructor(private var context: Context) {
         }
     }*/
 
-    fun scanLe(enable: Boolean, stop: () -> Unit, resultCallback: (result: ScanResultData) -> Unit) {
+    fun scanLe(enable: Boolean, stop: () -> Unit, resultCallback: ((result: ScanResultData) -> Unit)?) {
         if (bluetoothAdapter.isEnabled) {
             scanLeDevice(enable, stop, resultCallback) //make sure scan function won't be called several times
         }
     }
 
     var scanResultCallback: ((result: ScanResultData) -> Unit)? = null
-    private fun scanLeDevice(enable: Boolean, stop: () -> Unit, resultCallback: (result: ScanResultData) -> Unit) {
+    private fun scanLeDevice(enable: Boolean, stop: () -> Unit, resultCallback: ((result: ScanResultData) -> Unit)?) {
         scanResultCallback = resultCallback
         if (enable) {
             // Stops scanning after a pre-defined scan period.
@@ -112,6 +112,7 @@ class BlueBerryBluetooth private constructor(private var context: Context) {
                     ) != PackageManager.PERMISSION_GRANTED
                 ) {
                     bluetoothAdapter?.bluetoothLeScanner?.stopScan(mLeScanCallback)
+                    scanResultCallback = null
                     stop()
                 }
             }, 10000)
@@ -120,6 +121,7 @@ class BlueBerryBluetooth private constructor(private var context: Context) {
         } else {
             mScanning = false
             bluetoothAdapter?.bluetoothLeScanner?.stopScan(mLeScanCallback)
+            scanResultCallback = null
             stop()
         }
     }
@@ -142,7 +144,9 @@ class BlueBerryBluetooth private constructor(private var context: Context) {
                     val id = mac + ": " + name
                     val result = ScanResultData(id, result, result.device)
                     if (name == "BlueBerry") {
-                        scanResultCallback!!(result)
+                        if (scanResultCallback != null) {
+                            scanResultCallback!!(result)
+                        }
                     }
                 }
             }

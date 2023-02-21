@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">LohmegaLog</string>
+    <string name="action_rescan">Re-scan</string>
+    <string name="action_stopscan">Stop Scan</string>
 </resources>

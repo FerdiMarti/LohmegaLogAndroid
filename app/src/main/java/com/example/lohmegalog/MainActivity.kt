@@ -4,11 +4,13 @@ import android.Manifest
 import android.bluetooth.*
 import android.content.Intent
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +20,8 @@ class MainActivity : AppCompatActivity() {
     var scanResultView: RecyclerView? = null
     var progressBar: ProgressBar? = null
     val bleAdapter = BlueBerryBluetooth.getInstance(this)
+    var stopScanButton: MenuItem? = null
+    var rescanButton: MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +38,32 @@ class MainActivity : AppCompatActivity() {
             openDevicePage(data.device)
         })
         scanResultView?.adapter = adapter
+
+        setSupportActionBar(findViewById(R.id.main_toolbar))
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.menu_main, menu)
+        stopScanButton = menu!!.findItem(R.id.action_stopscan)
+        rescanButton = menu!!.findItem(R.id.action_rescan)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.action_rescan -> {
+            startScan()
+            true
+        }
+
+        R.id.action_stopscan -> {
+            stopScan()
+            true
+        }
+
+        else -> {
+            super.onOptionsItemSelected(item)
+        }
     }
 
     fun openDevicePage(device: BluetoothDevice) {
@@ -63,16 +93,43 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startScan() {
-        progressBar?.visibility = View.VISIBLE
+        clearScanResults()
+        setScanningUI()
         bleAdapter.scanLe(true, {
-            progressBar?.visibility = View.GONE
-        }) { result ->
-            if (!scanResults.contains(result)) {
-                scanResults.add(result)
-                scanResultView?.adapter?.notifyDataSetChanged()
-                Log.d("RESULT", result.name)
-            }
+            setStopUI()
+        }, { result ->
+            addScanResult(result)
+        })
+    }
+
+    private fun addScanResult(result: ScanResultData) {
+        if (!scanResults.contains(result)) {
+            scanResults.add(result)
+            scanResultView?.adapter?.notifyDataSetChanged()
         }
+    }
+
+    private fun clearScanResults() {
+        scanResults.clear()
+        scanResultView?.adapter?.notifyDataSetChanged()
+    }
+
+    private fun stopScan() {
+        bleAdapter.scanLe(false, {
+            setStopUI()
+        }, null)
+    }
+
+    private fun setScanningUI() {
+        stopScanButton?.isVisible = true
+        rescanButton?.isVisible = false
+        progressBar?.visibility = View.VISIBLE
+    }
+
+    private fun setStopUI() {
+        stopScanButton?.isVisible = false
+        rescanButton?.isVisible = true
+        progressBar?.visibility = View.GONE
     }
 
     companion object {

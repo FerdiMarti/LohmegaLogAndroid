@@ -14,7 +14,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.LohmegaLog">
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity
             android:name=".DeviceActivity"
             android:exported="false" />
