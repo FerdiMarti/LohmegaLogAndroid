@@ -1,6 +1,7 @@
 package com.example.lohmegalog
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
@@ -11,6 +12,7 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 
 
+@SuppressLint("MissingPermission")
 class BlueBerryBluetooth private constructor(private var context: Context) {
 
     companion object {
@@ -46,24 +48,13 @@ class BlueBerryBluetooth private constructor(private var context: Context) {
         if (bluetoothGatt != null) {
             closeConnection(device)
         }
-        if (ActivityCompat.checkSelfPermission(context,
-                Manifest.permission.BLUETOOTH_CONNECT
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            bluetoothGatt = device.connectGatt(context, false, bluetoothGattCallback)
-        }
+        bluetoothGatt = device.connectGatt(context, false, bluetoothGattCallback)
     }
 
     fun closeConnection(device: BluetoothDevice) {
         bluetoothGatt?.let { gatt ->
-            if (ActivityCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.BLUETOOTH_CONNECT
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                gatt.close()
-                bluetoothGatt = null
-            }
+            gatt.close()
+            bluetoothGatt = null
         }
     }
 
@@ -76,22 +67,6 @@ class BlueBerryBluetooth private constructor(private var context: Context) {
             }
         }
     }
-
-    /*private fun setDeviceBluetoothDiscoverable() {
-        //no need to request bluetooth permission if  discoverability is requested
-        val discoverableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE)
-        discoverableIntent.putExtra(
-            BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION,
-            0
-        )// 0 to keep it always discoverable
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.BLUETOOTH_ADVERTISE
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            startActivity(discoverableIntent)
-        }
-    }*/
 
     fun scanLe(enable: Boolean, stop: () -> Unit, resultCallback: ((result: ScanResultData) -> Unit)?) {
         if (bluetoothAdapter.isEnabled) {
@@ -106,15 +81,9 @@ class BlueBerryBluetooth private constructor(private var context: Context) {
             // Stops scanning after a pre-defined scan period.
             Handler().postDelayed({
                 mScanning = false
-                if (ActivityCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.BLUETOOTH_SCAN
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    bluetoothAdapter?.bluetoothLeScanner?.stopScan(mLeScanCallback)
-                    scanResultCallback = null
-                    stop()
-                }
+                bluetoothAdapter?.bluetoothLeScanner?.stopScan(mLeScanCallback)
+                scanResultCallback = null
+                stop()
             }, 10000)
             mScanning = true
             bluetoothAdapter?.bluetoothLeScanner?.startScan(mLeScanCallback)
@@ -134,19 +103,13 @@ class BlueBerryBluetooth private constructor(private var context: Context) {
                 if (result == null) {
                     return
                 }
-                if (ActivityCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.BLUETOOTH_CONNECT
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    val mac = result.device.toString()
-                    val name = result.device.name
-                    val id = mac + ": " + name
-                    val result = ScanResultData(id, result, result.device)
-                    if (name == "BlueBerry") {
-                        if (scanResultCallback != null) {
-                            scanResultCallback!!(result)
-                        }
+                val mac = result.device.toString()
+                val name = result.device.name
+                val id = mac + ": " + name
+                val result = ScanResultData(id, result, result.device)
+                if (name == "BlueBerry") {
+                    if (scanResultCallback != null) {
+                        scanResultCallback!!(result)
                     }
                 }
             }

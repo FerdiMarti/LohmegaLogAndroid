@@ -27,8 +27,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        allowLocationDetectionPermissions()
-
         progressBar = findViewById(R.id.progress)
 
         scanResultView = findViewById<RecyclerView>(R.id.scan_result_view)
@@ -40,6 +38,8 @@ class MainActivity : AppCompatActivity() {
         scanResultView?.adapter = adapter
 
         setSupportActionBar(findViewById(R.id.main_toolbar))
+
+        allowLocationDetectionPermissions()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
