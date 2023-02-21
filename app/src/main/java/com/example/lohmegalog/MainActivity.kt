@@ -5,7 +5,6 @@ import android.bluetooth.*
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -19,7 +18,7 @@ class MainActivity : AppCompatActivity() {
     private val scanResults: ArrayList<ScanResultData> = ArrayList()
     var scanResultView: RecyclerView? = null
     var progressBar: ProgressBar? = null
-    val bleAdapter = BlueBerryBluetooth.getInstance(this)
+    val bleAdapter = BlueBerryBluetoothDiscoverer(this)
     var stopScanButton: MenuItem? = null
     var rescanButton: MenuItem? = null
 
@@ -33,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         scanResultView?.layoutManager = LinearLayoutManager(this)
         val adapter = ScanResultAdapter(scanResults,
         ScanResultAdapter.OnClickListener { data ->
-            openDevicePage(data.device)
+            openDevicePage(data.address)
         })
         scanResultView?.adapter = adapter
 
@@ -66,9 +65,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun openDevicePage(device: BluetoothDevice) {
-        bleAdapter.openConnection(device)
+    private fun openDevicePage(address: String) {
+        stopScan()
         val intent = Intent(this, DeviceActivity::class.java)
+        intent.putExtra("address", address)
         startActivity(intent)
     }
 

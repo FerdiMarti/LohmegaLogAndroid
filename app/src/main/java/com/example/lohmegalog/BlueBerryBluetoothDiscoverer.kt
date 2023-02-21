@@ -1,39 +1,16 @@
 package com.example.lohmegalog
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Handler
 import android.util.Log
-import androidx.core.app.ActivityCompat
 
 
 @SuppressLint("MissingPermission")
-class BlueBerryBluetooth private constructor(private var context: Context) {
-
-    companion object {
-        @Volatile
-        private lateinit var instance: BlueBerryBluetooth
-
-        fun getInstance(context: Context): BlueBerryBluetooth {
-            synchronized(this) {
-                if (!::instance.isInitialized) {
-                    instance = BlueBerryBluetooth(context)
-                } else {
-                    instance.setContext(context)
-                }
-                return instance
-            }
-        }
-    }
-
-    private fun setContext(context: Context) {
-        this.context = context
-    }
+class BlueBerryBluetoothDiscoverer constructor(private var context: Context) {
 
     private val bluetoothAdapter: BluetoothAdapter by lazy(LazyThreadSafetyMode.NONE) {
         val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -41,32 +18,6 @@ class BlueBerryBluetooth private constructor(private var context: Context) {
     }
 
     private var mScanning: Boolean = false
-
-    private var bluetoothGatt: BluetoothGatt? = null
-
-    fun openConnection(device: BluetoothDevice) {
-        if (bluetoothGatt != null) {
-            closeConnection(device)
-        }
-        bluetoothGatt = device.connectGatt(context, false, bluetoothGattCallback)
-    }
-
-    fun closeConnection(device: BluetoothDevice) {
-        bluetoothGatt?.let { gatt ->
-            gatt.close()
-            bluetoothGatt = null
-        }
-    }
-
-    private val bluetoothGattCallback = object : BluetoothGattCallback() {
-        override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
-            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                Log.d("CONNECTION", "CONNECTED")
-            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                Log.d("CONNECTION", "DISCONNECTED")
-            }
-        }
-    }
 
     fun scanLe(enable: Boolean, stop: () -> Unit, resultCallback: ((result: ScanResultData) -> Unit)?) {
         if (bluetoothAdapter.isEnabled) {
@@ -106,7 +57,7 @@ class BlueBerryBluetooth private constructor(private var context: Context) {
                 val mac = result.device.toString()
                 val name = result.device.name
                 val id = mac + ": " + name
-                val result = ScanResultData(id, result, result.device)
+                val result = ScanResultData(id, result, result.device.address)
                 if (name == "BlueBerry") {
                     if (scanResultCallback != null) {
                         scanResultCallback!!(result)
