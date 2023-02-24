@@ -1,6 +1,8 @@
 package com.example.lohmegalog
 
-class Defs {
+const val CCC_DESCRIPTOR_UUID = "00002902-0000-1000-8000-00805f9b34fb"
+
+class UUIDS {
     companion object {
         private fun _uuid_std(n: String): String {
             val base = "0000{}-0000-1000-8000-00805f9b34fb"
@@ -44,5 +46,308 @@ class Defs {
         val S_GENERIC_ATTRIBUTE_PROFILE = _uuid_std("1801")
         // Service Changed ()
         val C_SERVICE_CHANGED = _uuid_std("2a05")
+
+        //Battery Service
+        val S_BATTERY = _uuid_std("180f")
+        // Battery Level
+        val C_BATTERY_LEVEL = _uuid_std("2a19")
+    }
+}
+
+class CMD_OPCODE {
+    //Command (request) codes (aka 'BB_LOG_CMD_...')
+
+    companion object {
+        // fmt: off
+        val UPDATE_READ_PTR       =  0x00
+        val BLINK_LED             =  0x01
+        val ENTER_DFU             =  0x02
+        val CALIBRATE_GYRO        =  0x03
+        val CALIBRATE_COMPASS     =  0x04
+        val CALIBRATE_END         =  0x05
+        val  SET_PASSCODE         =  0x06
+        val GET_PASSCODE_STATE    =  0x07
+        val SET_DISABLE_CAL_CORR  =  0x08
+        val  GET_DISABLE_CAL_CORR =  0x09
+        val CAL_CLEAR_TEMP_LUT    =  0x0A
+        val CAL_SET_TEMP_LUT_VAL  =  0x0B
+        val CAL_SAVE_TEMP_LUT     =  0x0C
+        val UPDATE_GET_MEM        =  0x70
+        // fmt: on
+    }
+}
+
+class CMD_RESP {
+    //Command response codes. (aka 'RESP_...')
+
+    companion object {
+        //fmt: off
+        val SUCCESS                     =  0x00
+        val ERROR                       =  0x01
+        val ERROR_PASSCODE_FORMAT       =  0x02
+        val ERROR_COMPASS_NO_MOTION     =  0x03
+        val ERROR_COMPASS_LARGE_MAGNET  =  0x04
+        val ERROR_ACCESS_DENIED         =  0x05
+        val ERROR_UNKNOWN_CMD           =  0x06
+        val COMPLETE                    =  0x80
+        val ERROR_CALIBRATION           =  0x81
+        val PROGRESS                    =  0x82
+        // fmt: on
+    }
+}
+
+
+class PASSCODE_STATUS {
+    // Password status codes (aka 'BB_PASSCODE_...')
+
+    companion object {
+        // fmt: off
+        val INIT       = 0x00 // the unit has not been configured yet
+        val UNVERIFIED = 0x01 // correct password has not been entered yet
+        val VERIFIED   = 0x02 // correct password has been entered
+        val DISABLED   = 0x03 // no password is needed
+        // fmt: on
+    }
+}
+
+class _BlueBerryLogEntryField {
+
+    private var enmask: Int? = null
+    private var pbname: String = ""
+    private var symbol: String = ""
+    private var unit: String = ""
+    private var tounit: ((Float) -> Float) = {x -> x}
+    private var alias: String = ""
+    private var subfields: List<String>? = null
+    private var txtfmt: String = "4.3f"
+    private var apiname: String = ""
+    private var colnames: ArrayList<String> = ArrayList()
+
+    /*
+        Args:
+            enmask: enable bit mask
+            pbname: protobuf descriptor field name
+            symbol: SI symbol or similar identifier
+            tounit: func to convert from raw value
+     */
+
+    constructor (enmask: Int?, pbname: String, symbol: String, unit: String, tounit: (Float) -> Float, alias: String?, subfields: List<String>?, txtfmt: String?){
+        this.enmask = enmask
+        this.pbname = pbname
+        this.symbol = symbol
+        this.unit = unit
+        this.tounit = tounit
+        this.txtfmt = "{{0: %s}}".format(txtfmt)
+
+        if (alias != null) {
+            this.apiname = alias
+        } else {
+            this.apiname = pbname
+        }
+
+        if (subfields != null) {
+            for (x in subfields) {
+                this.colnames.add("%s_%s".format(this.symbol, x))
+            }
+        } else {
+            this.colnames.add(this.symbol)
+        }
+
+        fun isConfigurable(): Boolean {
+            return (this.enmask == null)
+        }
+    }
+}
+
+
+class BlueBerryLogEntryFields {
+    /*
+    Log entry data field - i.e. a sensor value in most cases.
+    Names used in app csv output:
+        Unix time stamp,
+        Acceleration x (m/s²),
+        Acceleration y (m/s²),
+        Acceleration z (m/s²),
+        Magnetic field x (µT),
+        Magnetic field y (µT),
+        Magnetic field z (µT),
+        Rotation rate x (°/s),
+        Rotation rate y (°/s),
+        Rotation rate z (°/s),
+        Illuminance (lux),
+        Pressure (hPa),
+        Rel. humidity (%),
+        Temperature (C),
+        UV index,
+        Battery voltage (V)
+    */
+
+    companion object {
+
+        val PRESSURE = _BlueBerryLogEntryField(
+            enmask=0x0001,
+            pbname="pressure",
+            symbol="p",
+            unit="hPa",
+            tounit={x -> (x / 100.0).toFloat() },
+            alias= null,
+            subfields=null,
+            txtfmt=null
+        )
+
+        val HUMIDITY = _BlueBerryLogEntryField(
+            enmask=0x0002,
+            pbname="rh",
+            symbol="rh",
+            unit="%",
+            tounit={x -> (x / 10.0).toFloat()},
+            alias="humid",
+            subfields=null,
+            txtfmt=null
+        )
+
+        val TEMPERATURE = _BlueBerryLogEntryField(
+            enmask=0x0004,
+            pbname="temperature",
+            symbol="t",
+            unit="C",
+            tounit={x -> (x / 1000.0).toFloat()},
+            alias="temp",
+            subfields=null,
+            txtfmt=null
+        )
+
+        val COMPASS = _BlueBerryLogEntryField(
+            enmask=0x0008,
+            pbname="compass",
+            symbol="m",
+            unit="uT",
+            tounit={x -> (x * 4915.0 / 32768.0).toFloat()},
+            alias=null,
+            subfields=listOf("x", "y", "z"),
+            txtfmt=null
+        )
+
+        val ACCELEROMETER = _BlueBerryLogEntryField(
+            enmask=0x0010,
+            pbname="accelerometer",
+            symbol="a",
+            unit="m/s^2",
+            tounit={x -> (x * 2.0 * 9.81 / 32768.0).toFloat()},
+            alias="accel",
+            subfields=listOf("x", "y", "z"),
+            txtfmt=null
+        )
+
+        val GYRO = _BlueBerryLogEntryField(
+            enmask=0x0020,
+            pbname="gyro",
+            symbol="g",
+            unit="dps",
+            tounit={x -> (x * 250.0 / 32768.0).toFloat()},
+            alias=null,
+            subfields=listOf("x", "y", "z"),
+            txtfmt=null
+        )
+
+        val LUX = _BlueBerryLogEntryField(
+            enmask=0x0040,
+            pbname="lux",
+            symbol="L",
+            unit="lux",
+            tounit={x -> (x / 1000.0).toFloat()},
+            // alias="illuminance"
+            subfields=null,
+            alias=null,
+            txtfmt=null,
+        )
+
+        val UVI = _BlueBerryLogEntryField(
+            enmask=0x0100,
+            pbname="uvi",
+            symbol="UVi",
+            unit="",  // FIXME
+            tounit={x-> (x / 1000.0).toFloat()},
+            alias=null,
+            subfields=null,
+            txtfmt=null
+        )
+
+        val BATVOLT = _BlueBerryLogEntryField(
+            enmask=0x0200,
+            pbname="battery_mv",
+            symbol="bat",
+            unit="V",
+            tounit={x -> (x / 1000.0).toFloat()},
+            alias="batvolt",
+            subfields = null,
+            txtfmt = null
+        )
+
+        val TIME = _BlueBerryLogEntryField(
+            enmask=null,
+            pbname="timestamp",
+            symbol="TS",
+            unit="s",
+            tounit={x -> (x).toFloat()},
+            alias=null,
+            txtfmt="7.0f",
+            subfields = null,
+        )
+
+        val _GPIO0ADC = _BlueBerryLogEntryField(
+            enmask=null,
+            pbname="gpio0_mv",
+            symbol="gp0",
+            unit="mV",
+            tounit={x -> (x * 1.0).toFloat()},
+            alias=null,
+            subfields = null,
+            txtfmt = null
+        )
+
+        val _GPIO1ADC = _BlueBerryLogEntryField(
+            enmask=null,
+            pbname="gpio1_mv",
+            symbol="gp1",
+            unit="mV",
+            tounit={x -> (x * 1.0).toFloat()},
+            alias=null,
+            subfields = null,
+            txtfmt = null
+        )
+
+        val _INT_GPIO0 = _BlueBerryLogEntryField(
+            enmask=null,
+            pbname="int_gpio0",
+            symbol="int0",
+            unit="",
+            tounit={x -> x},
+            alias=null,
+            subfields = null,
+            txtfmt = null
+        )
+
+        val _INT_GPIO1 = _BlueBerryLogEntryField(
+            enmask=null,
+            pbname="int_gpio1",
+            symbol="int1",
+            unit="",
+            tounit={x -> x},
+            alias=null,
+            subfields = null,
+            txtfmt = null
+        )
+
+        val _INT_ACC = _BlueBerryLogEntryField(
+            enmask= null,
+            pbname="int_acc",
+            symbol="iacc1",
+            unit="",
+            tounit={x -> x},
+            alias=null,
+            subfields = null,
+            txtfmt = null
+        )
     }
 }

@@ -26,7 +26,7 @@ class ScanResultAdapter(private val scanResults: List<ScanResultData>, private v
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         val data = scanResults[position]
-        holder.textView.text = data.name
+        holder.textView.text = data.address
 
         holder.itemView.setOnClickListener {
             onClickListener.onClick(data)
