@@ -1,4 +1,4 @@
-package com.example.lohmegalog.UI
+package com.example.lohmegalog.ui
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

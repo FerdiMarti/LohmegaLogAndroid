@@ -1,4 +1,4 @@
-package com.example.lohmegalog.UI
+package com.example.lohmegalog.ui
 
 import android.Manifest
 import android.content.Intent
@@ -17,11 +17,11 @@ import com.example.lohmegalog.R
 
 class MainActivity : AppCompatActivity() {
     private val scanResults: ArrayList<ScanResultData> = ArrayList()
-    var scanResultView: RecyclerView? = null
-    var progressBar: ProgressBar? = null
-    val bleAdapter = BlueBerryBluetoothDiscoverer(this)
-    var stopScanButton: MenuItem? = null
-    var rescanButton: MenuItem? = null
+    private var scanResultView: RecyclerView? = null
+    private var progressBar: ProgressBar? = null
+    private val bleAdapter = BlueBerryBluetoothDiscoverer(this)
+    private var stopScanButton: MenuItem? = null
+    private var rescanButton: MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
 
         progressBar = findViewById(R.id.progress)
 
-        scanResultView = findViewById<RecyclerView>(R.id.scan_result_view)
+        scanResultView = findViewById(R.id.scan_result_view)
         scanResultView?.layoutManager = LinearLayoutManager(this)
         val adapter = ScanResultAdapter(scanResults,
         ScanResultAdapter.OnClickListener { data ->
@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
     private fun openDevicePage(address: String) {
         stopScan()
         val intent = Intent(this, DeviceActivity::class.java)
-        intent.putExtra("address", address)
+        intent.putExtra(DeviceActivity.ADDRESS_INTENT_KEY, address)
         startActivity(intent)
     }
 

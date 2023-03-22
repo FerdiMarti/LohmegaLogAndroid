@@ -12,7 +12,7 @@ import android.content.Intent
 import android.os.Handler
 import android.util.Log
 import androidx.core.app.ActivityCompat.startActivityForResult
-import com.example.lohmegalog.UI.ScanResultData
+import com.example.lohmegalog.ui.ScanResultData
 
 
 @SuppressLint("MissingPermission")

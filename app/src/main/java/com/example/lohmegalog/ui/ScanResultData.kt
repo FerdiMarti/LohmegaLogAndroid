@@ -1,4 +1,4 @@
-package com.example.lohmegalog.UI
+package com.example.lohmegalog.ui
 
 data class ScanResultData(val address: String) {
 
@@ -7,5 +7,9 @@ data class ScanResultData(val address: String) {
         if(other !is ScanResultData) return false
 
         return this.address == other.address
+    }
+
+    override fun hashCode(): Int {
+        return address.hashCode()
     }
 }

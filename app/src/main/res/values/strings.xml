@@ -2,4 +2,21 @@
     <string name="app_name">LohmegaLog</string>
     <string name="action_rescan">Re-scan</string>
     <string name="action_stopscan">Stop Scan</string>
+    <string name="empty_scan_item">Device Address</string>
+    <string name="rtd_switch_title">Real Time Measurements</string>
+    <string name="rtd_acceleration_title">Acceleration</string>
+    <string name="rtd_battery_voltage_title">Battery Voltage</string>
+    <string name="rtd_illuminance_title">Illuminance</string>
+    <string name="rtd_magnetic_field_title">Magnetic Field</string>
+    <string name="rtd_pressure_title">Pressure</string>
+    <string name="rtd_humidity_title">Rel. Humidity</string>
+    <string name="rtd_rotation_title">Rotation Rate</string>
+    <string name="rtd_temperature_title">Temperature</string>
+    <string name="rtd_uv_title">UV Index</string>
+    <string name="device_disconnected">Not Connected</string>
+    <string name="device_connected">Connected</string>
+    <string name="device_value_unavailable">n/a</string>
+    <string name="device_blink_available">Blink</string>
+    <string name="device_battery_level">%1$s%%</string>
+    <string name="device_rssi">%1$s db</string>
 </resources>

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="#D5D5D5"
     android:orientation="vertical"
-    tools:context=".UI.MainActivity">
+    tools:context=".ui.MainActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/device_toolbar"
@@ -57,7 +57,7 @@
                     android:id="@+id/connected_text_view"
                     android:layout_width="match_parent"
                     android:layout_height="20dp"
-                    android:text="Not Connected"
+                    android:text="@string/device_disconnected"
                     android:textAlignment="center" />
             </LinearLayout>
 
@@ -79,7 +79,7 @@
                     android:id="@+id/rssi_text_view"
                     android:layout_width="match_parent"
                     android:layout_height="20dp"
-                    android:text="n/a"
+                    android:text="@string/device_value_unavailable"
                     android:textAlignment="center" />
             </LinearLayout>
 
@@ -102,7 +102,7 @@
                     android:id="@+id/battery_text_view"
                     android:layout_width="match_parent"
                     android:layout_height="20dp"
-                    android:text="n/a"
+                    android:text="@string/device_value_unavailable"
                     android:textAlignment="center" />
             </LinearLayout>
 
@@ -124,7 +124,7 @@
                     android:id="@+id/blink_text_view"
                     android:layout_width="match_parent"
                     android:layout_height="20dp"
-                    android:text="Not Connected"
+                    android:text="@string/device_disconnected"
                     android:textAlignment="center" />
             </LinearLayout>
         </LinearLayout>

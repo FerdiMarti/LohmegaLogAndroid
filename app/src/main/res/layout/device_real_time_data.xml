@@ -18,7 +18,7 @@
             android:id="@+id/rtd_switch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Real time Measurements"
+            android:text="@string/rtd_switch_title"
             android:textSize="17sp"/>
 
         <ProgressBar
@@ -42,7 +42,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Acceleration"
+                android:text="@string/rtd_acceleration_title"
                 android:textSize="15sp"/>
 
             <TextView
@@ -50,7 +50,6 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Item"
                 android:textAlignment="viewEnd"
                 android:textSize="15sp"/>
         </LinearLayout>
@@ -65,7 +64,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Battery Voltage"
+                android:text="@string/rtd_battery_voltage_title"
                 android:textSize="15sp"/>
 
             <TextView
@@ -73,7 +72,6 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Item"
                 android:textAlignment="viewEnd"
                 android:textSize="15sp"/>
         </LinearLayout>
@@ -88,7 +86,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Illuminance"
+                android:text="@string/rtd_illuminance_title"
                 android:textSize="15sp"/>
 
             <TextView
@@ -96,7 +94,6 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Item"
                 android:textAlignment="viewEnd"
                 android:textSize="15sp"/>
         </LinearLayout>
@@ -111,7 +108,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Magntic Field"
+                android:text="@string/rtd_magnetic_field_title"
                 android:textSize="15sp"/>
 
             <TextView
@@ -119,7 +116,6 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Item"
                 android:textAlignment="viewEnd"
                 android:textSize="15sp"/>
         </LinearLayout>
@@ -134,7 +130,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Pressure"
+                android:text="@string/rtd_pressure_title"
                 android:textSize="15sp"/>
 
             <TextView
@@ -142,7 +138,6 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Item"
                 android:textAlignment="viewEnd"
                 android:textSize="15sp"/>
         </LinearLayout>
@@ -157,7 +152,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Rel. Humidity"
+                android:text="@string/rtd_humidity_title"
                 android:textSize="15sp"/>
 
             <TextView
@@ -165,7 +160,6 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Item"
                 android:textAlignment="viewEnd"
                 android:textSize="15sp"/>
         </LinearLayout>
@@ -180,7 +174,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Rotation Rate"
+                android:text="@string/rtd_rotation_title"
                 android:textSize="15sp"/>
 
             <TextView
@@ -188,7 +182,6 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Item"
                 android:textAlignment="viewEnd"
                 android:textSize="15sp"/>
         </LinearLayout>
@@ -203,7 +196,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Temperature"
+                android:text="@string/rtd_temperature_title"
                 android:textSize="15sp"/>
 
             <TextView
@@ -211,7 +204,6 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Item"
                 android:textAlignment="viewEnd"
                 android:textSize="15sp"/>
         </LinearLayout>
@@ -226,7 +218,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="UV Index"
+                android:text="@string/rtd_uv_title"
                 android:textSize="15sp"/>
 
             <TextView
@@ -234,7 +226,6 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Item"
                 android:textAlignment="viewEnd"
                 android:textSize="15sp"/>
         </LinearLayout>
