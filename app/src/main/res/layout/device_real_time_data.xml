@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#ffffff"
+    app:cardElevation="6dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/rtd_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Real time Measurements" />
+
+        <LinearLayout
+            android:id="@+id/acc_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Acceleration"/>
+
+            <TextView
+                android:id="@+id/rtd_acc_value"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Item"
+                android:textAlignment="viewEnd"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/battvol_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Battery Voltage"/>
+
+            <TextView
+                android:id="@+id/rtd_battvol_value"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Item"
+                android:textAlignment="viewEnd"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/illuminance_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Illuminance"/>
+
+            <TextView
+                android:id="@+id/rtd_illuminance_value"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Item"
+                android:textAlignment="viewEnd"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/magn_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Magntic Field"/>
+
+            <TextView
+                android:id="@+id/rtd_magn_value"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Item"
+                android:textAlignment="viewEnd"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/pressure_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Pressure"/>
+
+            <TextView
+                android:id="@+id/rtd_pressure_value"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Item"
+                android:textAlignment="viewEnd"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/humidity_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Rel. Humidity"/>
+
+            <TextView
+                android:id="@+id/rtd_humidity_value"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Item"
+                android:textAlignment="viewEnd"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/rot_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Rotation Rate"/>
+
+            <TextView
+                android:id="@+id/rtd_rot_value"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Item"
+                android:textAlignment="viewEnd"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/temp_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Temperature"/>
+
+            <TextView
+                android:id="@+id/rtd_temp_value"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Item"
+                android:textAlignment="viewEnd"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/uv_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="UV Index"/>
+
+            <TextView
+                android:id="@+id/rtd_UV_value"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Item"
+                android:textAlignment="viewEnd"/>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

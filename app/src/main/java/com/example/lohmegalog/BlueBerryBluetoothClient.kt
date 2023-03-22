@@ -15,6 +15,7 @@ class BlueBerryBluetoothClient constructor(private val context: Context, private
     }
     private var bluetoothGatt: BluetoothGatt? = null
     private var characteristics: HashMap<String, BluetoothGattCharacteristic> = HashMap()
+    private var bbDeserializer = BlueBerryDeserializer()
 
     fun openConnection(address: String) {
         closeConnection()
@@ -41,6 +42,7 @@ class BlueBerryBluetoothClient constructor(private val context: Context, private
                 gatt?.discoverServices()
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.d("CONNECTION", "DISCONNECTED")
+                bbcCallback.onDisconnect()
             }
         }
 
@@ -61,36 +63,39 @@ class BlueBerryBluetoothClient constructor(private val context: Context, private
                 Log.d("GATT", "onMTUChange received: $status")
             }
             bbcCallback.onConnect()
-            gatt?.printGattTable()
-            displayGattServices(gatt?.services)
+            getGattServices(gatt?.services)
             readDeviceBattery()
             readDeviceRssi()
         }
 
         override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.d("VALUE", characteristic.getStringValue(0))
-                if (characteristic.uuid.toString() == UUIDS.C_BATTERY_LEVEL) {
+            val uuid = characteristic.uuid.toString()
+            if (uuid == UUIDS.C_BATTERY_LEVEL) {
+                if (status == BluetoothGatt.GATT_SUCCESS) {
                     val level = characteristic.value.first().toInt()
-                    Log.d("BATTERY LEVEL", level.toString())
-                    bbcCallback.onReceivedBattery(level)
+                    bbcCallback.onReceivedBattery(true, level)
+                } else {
+                    bbcCallback.onReceivedBattery(false, null)
                 }
-            } else {
-                Log.d("VALUE", "FAILED")
             }
         }
 
         override fun onReadRemoteRssi(gatt: BluetoothGatt?, rssi: Int, status: Int) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                bbcCallback.onReceivedRssi(rssi)
+                bbcCallback.onReceivedRssi(true, rssi)
             } else {
-                Log.d("RSSI", "FAILED")
+                bbcCallback.onReceivedRssi(false, null)
             }
         }
 
         override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
-            Log.d("VALUE", characteristic.value.toHexString())
-            Log.d("VALUE", "DONE")
+            val uuid = characteristic.uuid.toString()
+            if (uuid == UUIDS.C_SENSORS_RTD) {
+                val entry = bbDeserializer.processData(characteristic.value)
+                if (entry != null) {
+                    bbcCallback.onReceivedRealTimeData(true, entry)
+                }
+            }
         }
 
         override fun onCharacteristicWrite(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, status: Int) {
@@ -110,43 +115,15 @@ class BlueBerryBluetoothClient constructor(private val context: Context, private
         }
     }
 
-    private fun displayGattServices(gattServices: List<BluetoothGattService>?) {
+    private fun getGattServices(gattServices: List<BluetoothGattService>?) {
         if (gattServices == null) return
         val characteristics: HashMap<String, BluetoothGattCharacteristic> = HashMap()
 
-        // Loops through available GATT Services.
         gattServices.forEach { gattService ->
             val gattCharacteristics = gattService.characteristics
             gattCharacteristics.forEach { gattCharacteristic ->
                 val c_uuid = gattCharacteristic.uuid.toString()
                 characteristics[c_uuid] = gattCharacteristic
-                /*if (gattCharacteristic.uuid.toString() == UUIDS.C_SENSORS_RTD) {
-                    enableNotifications(gattCharacteristic)
-                }
-                if (c_uuid == UUIDS.C_SENSORS_LOG) {
-                    readCharacteristic(gattCharacteristic)
-                }
-                if (c_uuid == UUIDS.C_CMD_TX) {
-                    gattCharacteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-                    val data = ByteArray(1)
-                    data.set(0, CMD_OPCODE.BLINK_LED.toByte())
-                    gattCharacteristic.value = data
-                    writeCharacteristic(gattCharacteristic)
-                }
-                if (c_uuid == UUIDS.C_CFG_LOG_ENABLE) {
-                    gattCharacteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-                    val data = ByteArray(4)
-                    data.set(3, 1)
-                    gattCharacteristic.value = data
-                    writeCharacteristic(gattCharacteristic)
-                }
-                if (c_uuid == UUIDS.C_CFG_INTERVAL) {
-                    gattCharacteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-                    val data = ByteArray(4)
-                    data.set(3, 1)
-                    gattCharacteristic.value = data
-                    writeCharacteristic(gattCharacteristic)
-                }*/
             }
         }
         this.characteristics = characteristics
@@ -202,6 +179,24 @@ class BlueBerryBluetoothClient constructor(private val context: Context, private
         }
     }
 
+    fun subscribeToRTD() {
+        val chara = characteristics[UUIDS.C_SENSORS_RTD]
+        if (chara == null) {
+            //TODO
+            return
+        }
+        enableNotifications(chara)
+    }
+
+    fun unsubscribeFromRTD() {
+        val chara = characteristics[UUIDS.C_SENSORS_RTD]
+        if (chara == null) {
+            //TODO
+            return
+        }
+        disableNotifications(chara)
+    }
+
     fun BluetoothGattCharacteristic.containsProperty(property: Int): Boolean {
         return properties and property != 0
     }
@@ -220,9 +215,6 @@ class BlueBerryBluetoothClient constructor(private val context: Context, private
 
     fun BluetoothGattCharacteristic.isNotifiable(): Boolean =
         containsProperty(BluetoothGattCharacteristic.PROPERTY_NOTIFY)
-
-    fun ByteArray.toHexString(): String =
-        joinToString(separator = " ", prefix = "0x") { String.format("%02X", it) }
 
     fun readCharacteristic(characteristic: BluetoothGattCharacteristic) {
         bluetoothGatt?.let { gatt ->

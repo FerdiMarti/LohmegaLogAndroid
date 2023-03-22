@@ -1,6 +1,6 @@
 package com.example.lohmegalog
 
-import android.bluetooth.BluetoothGatt
+import com.example.lohmegalog.protobuf.BbLogEntry
 
 abstract class BlueBerryBluetoothClientCallback {
 
@@ -8,19 +8,19 @@ abstract class BlueBerryBluetoothClientCallback {
         throw java.lang.RuntimeException("Stub!")
     }
 
-    open fun onReceivedConfiguration() {
+    open fun onDisconnect() {
         throw java.lang.RuntimeException("Stub!")
     }
 
-    open fun onReceivedRealTimeData() {
+    open fun onReceivedRealTimeData(success: Boolean, data: BbLogEntry.bb_log_entry) {
         throw java.lang.RuntimeException("Stub!")
     }
 
-    open fun onReceivedRssi(rssi: Int) {
+    open fun onReceivedRssi(success: Boolean, rssi: Int?) {
         throw java.lang.RuntimeException("Stub!")
     }
 
-    open fun onReceivedBattery(batteryLevel: Int) {
+    open fun onReceivedBattery(success: Boolean, batteryLevel: Int?) {
         throw java.lang.RuntimeException("Stub!")
     }
 }

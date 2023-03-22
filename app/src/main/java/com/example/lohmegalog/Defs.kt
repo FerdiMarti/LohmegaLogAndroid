@@ -1,5 +1,7 @@
 package com.example.lohmegalog
 
+import java.util.Dictionary
+
 const val CCC_DESCRIPTOR_UUID = "00002902-0000-1000-8000-00805f9b34fb"
 
 class UUIDS {
@@ -112,16 +114,16 @@ class PASSCODE_STATUS {
 
 class _BlueBerryLogEntryField {
 
-    private var enmask: Int? = null
-    private var pbname: String = ""
-    private var symbol: String = ""
-    private var unit: String = ""
-    private var tounit: ((Float) -> Float) = {x -> x}
-    private var alias: String = ""
-    private var subfields: List<String>? = null
-    private var txtfmt: String = "4.3f"
-    private var apiname: String = ""
-    private var colnames: ArrayList<String> = ArrayList()
+    var enmask: Int? = null
+    var pbname: String = ""
+    var symbol: String = ""
+    var unit: String = ""
+    var tounit: ((Float) -> Float) = {x -> x}
+    var alias: String = ""
+    var subfields: List<String>? = null
+    var txtfmt: String = "4.3f"
+    var apiname: String = ""
+    var colnames: ArrayList<String> = ArrayList()
 
     /*
         Args:
@@ -221,7 +223,7 @@ class BlueBerryLogEntryFields {
             enmask=0x0008,
             pbname="compass",
             symbol="m",
-            unit="uT",
+            unit="µT",
             tounit={x -> (x * 4915.0 / 32768.0).toFloat()},
             alias=null,
             subfields=listOf("x", "y", "z"),
@@ -232,7 +234,7 @@ class BlueBerryLogEntryFields {
             enmask=0x0010,
             pbname="accelerometer",
             symbol="a",
-            unit="m/s^2",
+            unit="m/s²",
             tounit={x -> (x * 2.0 * 9.81 / 32768.0).toFloat()},
             alias="accel",
             subfields=listOf("x", "y", "z"),
@@ -243,7 +245,7 @@ class BlueBerryLogEntryFields {
             enmask=0x0020,
             pbname="gyro",
             symbol="g",
-            unit="dps",
+            unit="°/s",
             tounit={x -> (x * 250.0 / 32768.0).toFloat()},
             alias=null,
             subfields=listOf("x", "y", "z"),
@@ -348,6 +350,19 @@ class BlueBerryLogEntryFields {
             alias=null,
             subfields = null,
             txtfmt = null
+        )
+
+        val fieldMap = mapOf(
+            PRESSURE.pbname to PRESSURE,
+            HUMIDITY.pbname to HUMIDITY,
+            TEMPERATURE.pbname to TEMPERATURE,
+            COMPASS.pbname to COMPASS,
+            ACCELEROMETER.pbname to ACCELEROMETER,
+            GYRO.pbname to GYRO,
+            LUX.pbname to LUX,
+            UVI.pbname to UVI,
+            BATVOLT.pbname to BATVOLT,
+            TIME.pbname to TIME,
         )
     }
 }
