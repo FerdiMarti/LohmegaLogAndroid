@@ -1,14 +1,10 @@
-package com.example.lohmegalog
-import android.Manifest
-import android.bluetooth.le.ScanResult
-import android.content.pm.PackageManager
+package com.example.lohmegalog.UI
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.example.lohmegalog.R
 
 class ScanResultAdapter(private val scanResults: List<ScanResultData>, private val onClickListener: OnClickListener) : RecyclerView.Adapter<ScanResultAdapter.ViewHolder>() {
 

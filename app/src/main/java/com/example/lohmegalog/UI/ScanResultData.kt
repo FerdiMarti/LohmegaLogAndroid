@@ -1,7 +1,4 @@
-package com.example.lohmegalog
-
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.le.ScanResult
+package com.example.lohmegalog.UI
 
 data class ScanResultData(val address: String) {
 

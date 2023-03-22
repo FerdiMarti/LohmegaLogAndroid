@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="#D5D5D5"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".UI.MainActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/device_toolbar"
@@ -19,7 +19,7 @@
 
 
     <ProgressBar
-        android:id="@+id/progress"
+        android:id="@+id/progress_connect"
         style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
                     android:layout_width="30dp"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    app:srcCompat="@drawable/range_disconnected" />
+                    app:srcCompat="@drawable/rssi_disconnected" />
 
                 <TextView
                     android:id="@+id/rssi_text_view"

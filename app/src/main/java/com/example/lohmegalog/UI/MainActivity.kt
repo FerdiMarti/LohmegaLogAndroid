@@ -1,11 +1,9 @@
-package com.example.lohmegalog
+package com.example.lohmegalog.UI
 
 import android.Manifest
-import android.bluetooth.*
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -14,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.lohmegalog.BBBluetooth.BlueBerryBluetoothDiscoverer
+import com.example.lohmegalog.R
 
 class MainActivity : AppCompatActivity() {
     private val scanResults: ArrayList<ScanResultData> = ArrayList()
@@ -75,7 +75,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun allowLocationDetectionPermissions() {
         ActivityCompat.requestPermissions(this@MainActivity,
-            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), FINE_LOCATION_PERMISSION_REQUEST)
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), FINE_LOCATION_PERMISSION_REQUEST
+        )
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,

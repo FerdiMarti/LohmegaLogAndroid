@@ -3,12 +3,12 @@
 
     <item android:id="@+id/action_rescan"
         android:title="@string/action_rescan"
-        android:icon="@android:drawable/ic_menu_revert"
+        android:icon="@drawable/refresh"
         app:showAsAction="always"/>
 
     <item android:id="@+id/action_stopscan"
         android:title="@string/action_stopscan"
-        android:icon="@android:drawable/ic_menu_close_clear_cancel"
+        android:icon="@drawable/close"
         app:showAsAction="always"/>
 
 </menu>

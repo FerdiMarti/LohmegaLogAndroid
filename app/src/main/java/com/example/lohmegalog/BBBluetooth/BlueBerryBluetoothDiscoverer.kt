@@ -1,4 +1,4 @@
-package com.example.lohmegalog
+package com.example.lohmegalog.BBBluetooth
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -10,9 +10,9 @@ import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.content.Intent
 import android.os.Handler
-import android.os.ParcelUuid
 import android.util.Log
 import androidx.core.app.ActivityCompat.startActivityForResult
+import com.example.lohmegalog.UI.ScanResultData
 
 
 @SuppressLint("MissingPermission")

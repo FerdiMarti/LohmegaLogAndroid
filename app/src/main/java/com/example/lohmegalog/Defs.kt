@@ -1,7 +1,5 @@
 package com.example.lohmegalog
 
-import java.util.Dictionary
-
 const val CCC_DESCRIPTOR_UUID = "00002902-0000-1000-8000-00805f9b34fb"
 
 class UUIDS {
@@ -112,7 +110,7 @@ class PASSCODE_STATUS {
     }
 }
 
-class _BlueBerryLogEntryField {
+class BlueBerryLogEntryField {
 
     var enmask: Int? = null
     var pbname: String = ""
@@ -186,7 +184,7 @@ class BlueBerryLogEntryFields {
 
     companion object {
 
-        val PRESSURE = _BlueBerryLogEntryField(
+        val PRESSURE = BlueBerryLogEntryField(
             enmask=0x0001,
             pbname="pressure",
             symbol="p",
@@ -197,7 +195,7 @@ class BlueBerryLogEntryFields {
             txtfmt=null
         )
 
-        val HUMIDITY = _BlueBerryLogEntryField(
+        val HUMIDITY = BlueBerryLogEntryField(
             enmask=0x0002,
             pbname="rh",
             symbol="rh",
@@ -208,7 +206,7 @@ class BlueBerryLogEntryFields {
             txtfmt=null
         )
 
-        val TEMPERATURE = _BlueBerryLogEntryField(
+        val TEMPERATURE = BlueBerryLogEntryField(
             enmask=0x0004,
             pbname="temperature",
             symbol="t",
@@ -219,7 +217,7 @@ class BlueBerryLogEntryFields {
             txtfmt=null
         )
 
-        val COMPASS = _BlueBerryLogEntryField(
+        val COMPASS = BlueBerryLogEntryField(
             enmask=0x0008,
             pbname="compass",
             symbol="m",
@@ -230,7 +228,7 @@ class BlueBerryLogEntryFields {
             txtfmt=null
         )
 
-        val ACCELEROMETER = _BlueBerryLogEntryField(
+        val ACCELEROMETER = BlueBerryLogEntryField(
             enmask=0x0010,
             pbname="accelerometer",
             symbol="a",
@@ -241,7 +239,7 @@ class BlueBerryLogEntryFields {
             txtfmt=null
         )
 
-        val GYRO = _BlueBerryLogEntryField(
+        val GYRO = BlueBerryLogEntryField(
             enmask=0x0020,
             pbname="gyro",
             symbol="g",
@@ -252,7 +250,7 @@ class BlueBerryLogEntryFields {
             txtfmt=null
         )
 
-        val LUX = _BlueBerryLogEntryField(
+        val LUX = BlueBerryLogEntryField(
             enmask=0x0040,
             pbname="lux",
             symbol="L",
@@ -264,7 +262,7 @@ class BlueBerryLogEntryFields {
             txtfmt=null,
         )
 
-        val UVI = _BlueBerryLogEntryField(
+        val UVI = BlueBerryLogEntryField(
             enmask=0x0100,
             pbname="uvi",
             symbol="UVi",
@@ -275,7 +273,7 @@ class BlueBerryLogEntryFields {
             txtfmt=null
         )
 
-        val BATVOLT = _BlueBerryLogEntryField(
+        val BATVOLT = BlueBerryLogEntryField(
             enmask=0x0200,
             pbname="battery_mv",
             symbol="bat",
@@ -286,7 +284,7 @@ class BlueBerryLogEntryFields {
             txtfmt = null
         )
 
-        val TIME = _BlueBerryLogEntryField(
+        val TIME = BlueBerryLogEntryField(
             enmask=null,
             pbname="timestamp",
             symbol="TS",
@@ -297,7 +295,7 @@ class BlueBerryLogEntryFields {
             subfields = null,
         )
 
-        val _GPIO0ADC = _BlueBerryLogEntryField(
+        val _GPIO0ADC = BlueBerryLogEntryField(
             enmask=null,
             pbname="gpio0_mv",
             symbol="gp0",
@@ -308,7 +306,7 @@ class BlueBerryLogEntryFields {
             txtfmt = null
         )
 
-        val _GPIO1ADC = _BlueBerryLogEntryField(
+        val _GPIO1ADC = BlueBerryLogEntryField(
             enmask=null,
             pbname="gpio1_mv",
             symbol="gp1",
@@ -319,7 +317,7 @@ class BlueBerryLogEntryFields {
             txtfmt = null
         )
 
-        val _INT_GPIO0 = _BlueBerryLogEntryField(
+        val _INT_GPIO0 = BlueBerryLogEntryField(
             enmask=null,
             pbname="int_gpio0",
             symbol="int0",
@@ -330,7 +328,7 @@ class BlueBerryLogEntryFields {
             txtfmt = null
         )
 
-        val _INT_GPIO1 = _BlueBerryLogEntryField(
+        val _INT_GPIO1 = BlueBerryLogEntryField(
             enmask=null,
             pbname="int_gpio1",
             symbol="int1",
@@ -341,7 +339,7 @@ class BlueBerryLogEntryFields {
             txtfmt = null
         )
 
-        val _INT_ACC = _BlueBerryLogEntryField(
+        val _INT_ACC = BlueBerryLogEntryField(
             enmask= null,
             pbname="int_acc",
             symbol="iacc1",
@@ -350,19 +348,6 @@ class BlueBerryLogEntryFields {
             alias=null,
             subfields = null,
             txtfmt = null
-        )
-
-        val fieldMap = mapOf(
-            PRESSURE.pbname to PRESSURE,
-            HUMIDITY.pbname to HUMIDITY,
-            TEMPERATURE.pbname to TEMPERATURE,
-            COMPASS.pbname to COMPASS,
-            ACCELEROMETER.pbname to ACCELEROMETER,
-            GYRO.pbname to GYRO,
-            LUX.pbname to LUX,
-            UVI.pbname to UVI,
-            BATVOLT.pbname to BATVOLT,
-            TIME.pbname to TIME,
         )
     }
 }
