@@ -1,13 +1,17 @@
 package com.example.lohmegalog
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import com.example.lohmegalog.protobuf.BbLogEntry
 import com.google.android.material.switchmaterial.SwitchMaterial
+import java.util.*
+import kotlin.concurrent.timerTask
 import kotlin.math.pow
+import kotlin.math.roundToInt
 
 
 class DeviceActivity : AppCompatActivity() {
@@ -18,11 +22,12 @@ class DeviceActivity : AppCompatActivity() {
     var rssiTextView: TextView? = null
     var batteryImage: ImageView? = null
     var batteryTextView: TextView? = null
-    var blinkButton: ImageButton? = null
+    var blinkImage: ImageView? = null
     var blinkTV: TextView? = null
     var progressBar: ProgressBar? = null
 
     //RTD Views
+    var rtdProgressBar: ProgressBar? = null
     var rtdView: CardView? = null
     var rtdSwitch: SwitchMaterial? = null
     var accelerationView: LinearLayout? = null
@@ -44,6 +49,8 @@ class DeviceActivity : AppCompatActivity() {
     var tempTV: TextView? = null
     var uvTV: TextView? = null
 
+    private var firstRTD: Boolean = true
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,25 +69,27 @@ class DeviceActivity : AppCompatActivity() {
         rssiTextView = findViewById<TextView>(R.id.rssi_text_view)
         batteryImage = findViewById<ImageView>(R.id.battery_image)
         batteryTextView = findViewById<TextView>(R.id.battery_text_view)
-        blinkButton = findViewById<ImageButton>(R.id.blink_button)
+        blinkImage = findViewById<ImageView>(R.id.blink_image)
         blinkTV = findViewById<TextView>(R.id.blink_text_view)
         setSupportActionBar(findViewById(R.id.device_toolbar))
         getSupportActionBar()?.setDisplayHomeAsUpEnabled(true)
 
-        blinkButton?.setOnClickListener {
+        blinkImage?.setOnClickListener {
             blinkDevice()
         }
 
         rtdView = findViewById(R.id.rtd_view)
+        rtdProgressBar = findViewById(R.id.progress_rtd)
         setRTDGone()
         rtdSwitch = findViewById(R.id.rtd_switch)
         rtdSwitch?.isChecked = false
         rtdSwitch?.setOnCheckedChangeListener { buttonView, isChecked ->
             if (isChecked) {
-                setRTDFieldsVisible()
+                setRTDProgressBarVisible()
                 subscribeToRTD()
             } else {
                 setRTDFieldsGone()
+                setRTDProgressBarGone()
                 unsubscribeFromRTD()
             }
         }
@@ -139,6 +148,14 @@ class DeviceActivity : AppCompatActivity() {
         uvView?.visibility = View.VISIBLE
     }
 
+    fun setRTDProgressBarVisible() {
+        rtdProgressBar?.visibility = View.VISIBLE
+    }
+
+    fun setRTDProgressBarGone() {
+        rtdProgressBar?.visibility = View.GONE
+    }
+
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         disconnectDevice()
@@ -157,10 +174,15 @@ class DeviceActivity : AppCompatActivity() {
     }
 
     private fun blinkDevice() {
+        blinkImage?.setImageResource(R.drawable.blink_activated)
+        Timer().schedule(timerTask {
+            blinkImage?.setImageResource(R.drawable.blink_connected)
+        }, 2000)
         bbc?.blinkDevice()
     }
 
     private fun subscribeToRTD() {
+        this.firstRTD = true
         bbc?.subscribeToRTD()
     }
 
@@ -173,9 +195,9 @@ class DeviceActivity : AppCompatActivity() {
             runOnUiThread {
                 setRTDVisible()
                 connectedTV?.text = "Connected"
-                connectedImage?.setImageResource(R.drawable.connected)
+                connectedImage?.setImageResource(R.drawable.device_connected)
                 blinkTV?.text = "Blink"
-                blinkButton?.setImageResource(R.drawable.blink_active)
+                blinkImage?.setImageResource(R.drawable.blink_connected)
                 progressBar?.visibility = View.GONE
             }
         }
@@ -184,28 +206,35 @@ class DeviceActivity : AppCompatActivity() {
             runOnUiThread {
                 setRTDVisible()
                 connectedTV?.text = "Connected"
-                connectedImage?.setImageResource(R.drawable.connected)
+                connectedImage?.setImageResource(R.drawable.device_connected)
                 blinkTV?.text = "Blink"
-                blinkButton?.setImageResource(R.drawable.blink_active)
+                blinkImage?.setImageResource(R.drawable.blink_connected)
                 progressBar?.visibility = View.GONE
             }
         }
 
         override fun onReceivedBattery(success: Boolean, batteryLevel: Int?) {
             runOnUiThread {
-                batteryImage?.setImageResource(R.drawable.battery_loaded)
+                batteryImage?.setImageResource(selectBatteryImage(batteryLevel!!))
                 batteryTextView?.text = batteryLevel.toString() + "%"
             }
         }
 
         override fun onReceivedRssi(success: Boolean, rssi: Int?) {
             runOnUiThread{
-                rssiImage?.setImageResource(R.drawable.range_connected)
+                rssiImage?.setImageResource(selectRangeImage(-rssi!!))
                 rssiTextView?.text = rssi.toString() + " db"
             }
         }
 
         override fun onReceivedRealTimeData(success: Boolean, data: BbLogEntry.bb_log_entry) {
+            if (firstRTD) {
+                runOnUiThread {
+                    firstRTD = false
+                    setRTDFieldsVisible()
+                    setRTDProgressBarGone()
+                }
+            }
             if (success) {
                 accelerationTV?.text = constructFieldListString(BlueBerryLogEntryFields.ACCELEROMETER, data.accelerometerList)
                 battTV?.text = constructFieldString(BlueBerryLogEntryFields.BATVOLT, data.batteryMv)
@@ -217,6 +246,34 @@ class DeviceActivity : AppCompatActivity() {
                 tempTV?.text = constructFieldString(BlueBerryLogEntryFields.TEMPERATURE, data.temperature)
                 uvTV?.text = constructFieldString(BlueBerryLogEntryFields.UVI, data.uvi)
             }
+        }
+    }
+
+    fun selectBatteryImage(batteryLevel: Int): Int {
+        val percentagePerStep = 100 / 7
+        when(batteryLevel / percentagePerStep) {
+            0 -> return R.drawable.battery_1bar
+            1 -> return R.drawable.battery_1bar
+            2 -> return R.drawable.battery_2bar
+            3 -> return R.drawable.battery_3bar
+            4 -> return R.drawable.battery_4bar
+            5 -> return R.drawable.battery_5bar
+            6 -> return R.drawable.battery_6bar
+            7 -> return R.drawable.battery_full
+            else -> return R.drawable.battery_full
+        }
+    }
+
+    fun selectRangeImage(range: Int): Int {
+        val dbPerStep = -100.0 / 5.0
+        when((range / dbPerStep).roundToInt()) {
+            0 -> return R.drawable.range_full
+            1 -> return R.drawable.range_full
+            2 -> return R.drawable.range_4bar
+            3 -> return R.drawable.range_3bar
+            4 -> return R.drawable.range_2bar
+            5 -> return R.drawable.range_1bar
+            else -> return R.drawable.range_1bar
         }
     }
 

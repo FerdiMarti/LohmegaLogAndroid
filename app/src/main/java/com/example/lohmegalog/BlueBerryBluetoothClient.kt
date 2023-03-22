@@ -148,7 +148,7 @@ class BlueBerryBluetoothClient constructor(private val context: Context, private
         }
     }
 
-    public fun blinkDevice() {
+    fun blinkDevice() {
         val chara = characteristics[UUIDS.C_CMD_TX]
         if (chara == null) {
             //TODO

@@ -38,7 +38,14 @@ class BlueBerryDeserializer {
             return entry
         } catch (e: EOFException) {
             Log.d("Deserialize", e.message!!)
+        } catch (e: java.lang.Exception) {
+            this.flush()
+            Log.d("Deserialize", e.message!!)
         }
         return null
+    }
+
+    fun flush() {
+        this.buffer = ByteArray(0)
     }
 }

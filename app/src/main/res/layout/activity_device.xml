@@ -51,7 +51,7 @@
                     android:layout_width="30dp"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    app:srcCompat="@drawable/unconnected" />
+                    app:srcCompat="@drawable/device_disconnected" />
 
                 <TextView
                     android:id="@+id/connected_text_view"
@@ -73,7 +73,7 @@
                     android:layout_width="30dp"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    app:srcCompat="@drawable/range_unconnected" />
+                    app:srcCompat="@drawable/range_disconnected" />
 
                 <TextView
                     android:id="@+id/rssi_text_view"
@@ -96,7 +96,7 @@
                     android:layout_width="30dp"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    app:srcCompat="@drawable/battery_unloaded" />
+                    app:srcCompat="@drawable/battery_disconnected" />
 
                 <TextView
                     android:id="@+id/battery_text_view"
@@ -113,12 +113,12 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <ImageButton
-                    android:id="@+id/blink_button"
-                    android:layout_width="30dp"
+                <ImageView
+                    android:id="@+id/blink_image"
+                    android:layout_width="40dp"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    app:srcCompat="@drawable/blink_inactive" />
+                    app:srcCompat="@drawable/blink_disconnected" />
 
                 <TextView
                     android:id="@+id/blink_text_view"
