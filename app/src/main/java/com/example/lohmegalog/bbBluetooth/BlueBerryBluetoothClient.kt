@@ -12,7 +12,13 @@ import com.example.lohmegalog.UUIDS
 import java.util.*
 
 //TODO When functionality is extended, the use of a message queue becomes necessary. Otherwise, reads/ writes can get lost.
-@SuppressLint("MissingPermission")
+/**
+ * Blue berry bluetooth client
+ *
+ * @property context the context for BluetoothAdapter
+ * @property bbcCallback UI callback methods
+ */
+@SuppressLint("MissingPermission") //complains about missing ble permissions, but works anyway
 class BlueBerryBluetoothClient constructor(
     private val context: Context,
     private val bbcCallback: BlueBerryBluetoothClientCallback
@@ -29,6 +35,7 @@ class BlueBerryBluetoothClient constructor(
         bluetoothManager.adapter
     }
     private var bluetoothGatt: BluetoothGatt? = null
+    //holds fetched characteristics
     private var deviceCharacteristics: HashMap<String, BluetoothGattCharacteristic> = HashMap()
     private var bbDeserializer = BlueBerryDeserializer()
     private var connectionTimeoutHandler = Handler(Looper.getMainLooper())
@@ -48,6 +55,9 @@ class BlueBerryBluetoothClient constructor(
         }
     }
 
+    /**
+     * if not invalidated, will assume that connection timed out.
+     */
     private fun checkForConnectionTimeout() {
         connectionTimeoutHandler.postDelayed({
             closeConnection()
@@ -64,10 +74,12 @@ class BlueBerryBluetoothClient constructor(
         }
     }
 
+    //Callbacks for Gatt operations
     private val bluetoothGattCallback = object : BluetoothGattCallback() {
+
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-                connectionTimeoutHandler.removeCallbacksAndMessages(null)
+                connectionTimeoutHandler.removeCallbacksAndMessages(null) //connection did not timeout
                 Log.d(TAG, "Connected to Device")
                 gatt?.discoverServices()
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
@@ -78,7 +90,7 @@ class BlueBerryBluetoothClient constructor(
 
         override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                gatt?.requestMtu(GATT_MAX_MTU_SIZE)
+                gatt?.requestMtu(GATT_MAX_MTU_SIZE) //increase MTU
             } else {
                 Log.d(TAG, "Receiving GATT Services Failed")
                 bbcCallback.onConnectionError()
@@ -91,8 +103,9 @@ class BlueBerryBluetoothClient constructor(
             } else {
                 Log.d(TAG, "onMTUChange received: $status")
             }
+            //Setup complete, store characteristics and fetch first values
+            storeGattCharacteristics(gatt?.services)
             bbcCallback.onConnect()
-            storeGattServices(gatt?.services)
             readDeviceBattery()
             readDeviceRssi()
         }
@@ -159,10 +172,11 @@ class BlueBerryBluetoothClient constructor(
         }
     }
 
-    private fun storeGattServices(gattServices: List<BluetoothGattService>?) {
+    private fun storeGattCharacteristics(gattServices: List<BluetoothGattService>?) {
         if (gattServices == null) return
         val characteristics: HashMap<String, BluetoothGattCharacteristic> = HashMap()
 
+        //loop through services and save characteristics by id
         gattServices.forEach { gattService ->
             val gattCharacteristics = gattService.characteristics
             gattCharacteristics.forEach { gattCharacteristic ->
@@ -235,6 +249,7 @@ class BlueBerryBluetoothClient constructor(
     }
 
     private fun enableNotifications(characteristic: BluetoothGattCharacteristic) {
+        //first check if characteristic is subscribable
         val cccdUuid = UUID.fromString(CCC_DESCRIPTOR_UUID)
         val payload = when {
             characteristic.isIndicatable() -> BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
@@ -264,6 +279,7 @@ class BlueBerryBluetoothClient constructor(
     }
 
     private fun disableNotifications(characteristic: BluetoothGattCharacteristic) {
+        //first check if characteristic is subscribable
         if (!characteristic.isNotifiable() && !characteristic.isIndicatable()) {
             Log.e(
                 TAG,
@@ -288,6 +304,10 @@ class BlueBerryBluetoothClient constructor(
         )
     }
 
+    /**
+     * Logs a nice visualization of received Gatt services and characteristics
+     *
+     */
     private fun BluetoothGatt.printGattTable() {
         if (services.isEmpty()) {
             Log.i(

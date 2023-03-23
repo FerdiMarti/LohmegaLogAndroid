@@ -21,7 +21,9 @@ import kotlin.concurrent.timerTask
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
-
+/**
+ * Activity for connecting to a device and receiving real time data
+ */
 class DeviceActivity : AppCompatActivity() {
     companion object {
         const val ADDRESS_INTENT_KEY = "device_address"
@@ -133,6 +135,7 @@ class DeviceActivity : AppCompatActivity() {
         }
     }
 
+    //Back button in toolbar pressed
     override fun onSupportNavigateUp(): Boolean {
         disconnectDevice()
         onBackPressed()
@@ -140,13 +143,16 @@ class DeviceActivity : AppCompatActivity() {
     }
 
     private fun connectToDevice(deviceAddress: String?) {
+        //Check permissions again
         if (!BluetoothPermissions.checkBLEPermissions(this)) {
             BluetoothPermissions.showPermissionsInfo(this)
         }
 
         if (deviceAddress == null) {
+            //top level exception because programmatic error
             throw Exception("No device address given")
         }
+
         setConnectProgressBarVisible()
         try {
             bbc?.openConnection(deviceAddress)
@@ -159,7 +165,7 @@ class DeviceActivity : AppCompatActivity() {
     }
 
     private fun disconnectDevice() {
-        invalidateStatusTimer()
+        invalidateStatusTimer() //don't update rssi and battery regularly anymore
         bbc?.closeConnection()
     }
 
@@ -201,6 +207,7 @@ class DeviceActivity : AppCompatActivity() {
         }
     }
 
+    //start updating battery and rssi regularly
     private fun startStatusTimer() {
         if (statusTimer != null) {
             invalidateStatusTimer()
@@ -219,6 +226,7 @@ class DeviceActivity : AppCompatActivity() {
         }
     }
 
+    //callbacks for BlueBerry operations
     private val bbcCallback = object : BlueBerryBluetoothClientCallback() {
         override fun onConnect() {
             isConnected = true
@@ -457,6 +465,11 @@ class DeviceActivity : AppCompatActivity() {
         return field.tounit(data.toFloat()).round(3).toString() + " " + field.unit
     }
 
+    private fun Float.round(decimals: Int): Float {
+        val multiplier = 10.0.pow(decimals)
+        return ((this * multiplier).toInt().toFloat() / multiplier).toFloat()
+    }
+
     private fun showInfoDialog(message: String) {
         runOnUiThread {
             val builder = AlertDialog.Builder(this)
@@ -467,10 +480,5 @@ class DeviceActivity : AppCompatActivity() {
             }
             builder.show()
         }
-    }
-
-    private fun Float.round(decimals: Int): Float {
-        val multiplier = 10.0.pow(decimals)
-        return ((this * multiplier).toInt().toFloat() / multiplier).toFloat()
     }
 }

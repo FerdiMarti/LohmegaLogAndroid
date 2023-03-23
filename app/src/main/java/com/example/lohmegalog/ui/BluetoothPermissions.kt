@@ -8,6 +8,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import com.example.lohmegalog.R
 
+/**
+ * Helper methods to handle BLE permissions
+ */
 class BluetoothPermissions {
     companion object {
 

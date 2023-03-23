@@ -7,12 +7,16 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lohmegalog.R
 
+/**
+ * RecyclerView Adapter for scan results
+ *
+ * @property scanResults - takes a list of ScanResultData to Display
+ * @property onClickListener - takes a click listener for list elements
+ */
 class ScanResultAdapter(
     private val scanResults: List<ScanResultData>,
     private val onClickListener: OnClickListener
 ) : RecyclerView.Adapter<ScanResultAdapter.ViewHolder>() {
-
-    // create new views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         // inflates the card_view_design view
         // that is used to hold list item
@@ -42,6 +46,9 @@ class ScanResultAdapter(
         val textView: TextView = itemView.findViewById(R.id.textView)
     }
 
+    /**
+     * On click listener for result list entry. Takes the ScanResultData of the row that was clicked.
+     */
     class OnClickListener(val clickListener: (data: ScanResultData) -> Unit) {
         fun onClick(data: ScanResultData) = clickListener(data)
     }

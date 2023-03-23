@@ -2,6 +2,9 @@ package com.example.lohmegalog.bbBluetooth
 
 import android.bluetooth.BluetoothGattCharacteristic
 
+/**
+ * Extensions for BluetoothGattCharacteristic
+ */
 fun BluetoothGattCharacteristic.containsProperty(property: Int): Boolean {
     return properties and property != 0
 }

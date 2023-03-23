@@ -16,6 +16,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.lohmegalog.R
 import com.example.lohmegalog.bbBluetooth.BlueBerryBluetoothDiscoverer
 
+/**
+ * Activity which scans for BlueBerry devices and displays them in a list.
+ */
 class ScanActivity : AppCompatActivity() {
     private var scanResultView: RecyclerView? = null
     private var progressBar: ProgressBar? = null
@@ -79,6 +82,7 @@ class ScanActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    //Callback for requesting location permission
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>, grantResults: IntArray
@@ -89,6 +93,7 @@ class ScanActivity : AppCompatActivity() {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     this.startScan()
                 } else {
+                    //show info if permission denied
                     BluetoothPermissions.showPermissionsInfo(this)
                 }
                 return

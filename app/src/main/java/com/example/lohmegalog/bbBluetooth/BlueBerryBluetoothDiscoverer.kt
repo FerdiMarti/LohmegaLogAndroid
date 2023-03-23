@@ -13,8 +13,11 @@ import android.os.Looper
 import android.util.Log
 import com.example.lohmegalog.ui.ScanResultData
 
-
-@SuppressLint("MissingPermission")
+/**
+ * Handles scanning for BlueBerry devices.
+ * @property context - needed to initialize BluetoothAdapter
+ */
+@SuppressLint("MissingPermission") //complains about missing ble permissions, but works anyway
 class BlueBerryBluetoothDiscoverer constructor(private var context: Activity) {
 
     companion object {
@@ -32,6 +35,13 @@ class BlueBerryBluetoothDiscoverer constructor(private var context: Activity) {
     private var scanning: Boolean = false
     private var stopScanHandler: Handler = Handler(Looper.getMainLooper())
 
+    /**
+     * start/ stop scanning for devices
+     *
+     * @param enable whether to start or stop scanning
+     * @param stop callback when scan is stopped
+     * @param resultCallback callback when a device was discovered
+     */
     fun scanLe(
         enable: Boolean,
         stop: () -> Unit,
@@ -47,7 +57,14 @@ class BlueBerryBluetoothDiscoverer constructor(private var context: Activity) {
         }
     }
 
-    var scanResultCallback: ((result: ScanResultData) -> Unit)? = null
+    var scanResultCallback: ((result: ScanResultData) -> Unit)? = null //object that holds the UI callback
+    /**
+     * start/ stop scanning for devices
+     *
+     * @param enable whether to start or stop scanning
+     * @param stop callback when scan is stopped
+     * @param resultCallback callback when a device was discovered
+     */
     private fun scanLeDevice(
         enable: Boolean,
         stop: () -> Unit,
@@ -61,7 +78,7 @@ class BlueBerryBluetoothDiscoverer constructor(private var context: Activity) {
                 scanLeDevice(false, stop, null)
             }, SCAN_PERIOD)
             scanning = true
-            //Filter only for BlueBerry Devices
+            //Filter for BlueBerry Devices
             val filters = listOf(ScanFilter.Builder().setDeviceName(BLUEBERRY_DEVICE_NAME).build())
             val settings = ScanSettings.Builder().build()
             bluetoothAdapter.bluetoothLeScanner?.startScan(
@@ -70,7 +87,7 @@ class BlueBerryBluetoothDiscoverer constructor(private var context: Activity) {
                 bluetoothAdapterScanCallback
             )
         } else {
-            stopScanHandler.removeCallbacksAndMessages(null)
+            stopScanHandler.removeCallbacksAndMessages(null) //prevent automatic stopping from handler (in case the user starts scan again immediately)
             scanning = false
             bluetoothAdapter.bluetoothLeScanner?.stopScan(bluetoothAdapterScanCallback)
             scanResultCallback = null
@@ -78,6 +95,9 @@ class BlueBerryBluetoothDiscoverer constructor(private var context: Activity) {
         }
     }
 
+    /**
+     * Callback for BluetoothAdapter
+     */
     private var bluetoothAdapterScanCallback: ScanCallback =
         object : ScanCallback() {
             override fun onScanResult(callbackType: Int, result: ScanResult?) {
