@@ -1,6 +1,6 @@
 # LohmegaLog Android
 
-## Android App for connecting to Lohmega BlueBerry boards
+## Android app for connecting to Lohmega BlueBerry boards
 
 Currently supports:
 - Scanning for devices
