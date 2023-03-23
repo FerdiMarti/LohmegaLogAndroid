@@ -65,6 +65,7 @@ class DeviceActivity : AppCompatActivity() {
 
     private var firstRTD: Boolean = true
     private var statusTimer: Timer? = null
+    private var isConnected: Boolean = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -163,6 +164,9 @@ class DeviceActivity : AppCompatActivity() {
     }
 
     private fun blinkDevice() {
+        if (!isConnected) {
+            return
+        }
         setBlinkButtonPressed()
         try {
             bbc?.blinkDevice()
@@ -190,7 +194,6 @@ class DeviceActivity : AppCompatActivity() {
 
     private fun readStatus() {
         try {
-            //TODO only one works
             bbc?.readDeviceBattery()
             bbc?.readDeviceRssi()
         } catch (exception: IllegalStateException) {
@@ -218,21 +221,25 @@ class DeviceActivity : AppCompatActivity() {
 
     private val bbcCallback = object : BlueBerryBluetoothClientCallback() {
         override fun onConnect() {
+            isConnected = true
             startStatusTimer()
             setUIConnected()
         }
 
         override fun onConnectTimeout() {
+            isConnected = false
             disconnectDevice()
             setUIDisconnected()
             showInfoDialog(getString(R.string.connection_timeout_text))
         }
 
         override fun onConnectionError() {
+            isConnected = false
             onConnectionError()
         }
 
         override fun onDisconnect() {
+            isConnected = false
             setUIDisconnected()
             invalidateStatusTimer()
             showInfoDialog(getString(R.string.device_disconnected_text))

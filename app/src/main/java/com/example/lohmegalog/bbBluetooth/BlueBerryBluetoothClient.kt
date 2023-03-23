@@ -11,6 +11,7 @@ import com.example.lohmegalog.CMD_OPCODE
 import com.example.lohmegalog.UUIDS
 import java.util.*
 
+//TODO When functionality is extended, the use of a message queue becomes necessary. Otherwise, reads/ writes can get lost.
 @SuppressLint("MissingPermission")
 class BlueBerryBluetoothClient constructor(
     private val context: Context,
