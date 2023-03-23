@@ -59,20 +59,20 @@ class CMD_OPCODE {
 
     companion object {
         // fmt: off
-        val UPDATE_READ_PTR       =  0x00
-        val BLINK_LED             =  0x01
-        val ENTER_DFU             =  0x02
-        val CALIBRATE_GYRO        =  0x03
-        val CALIBRATE_COMPASS     =  0x04
-        val CALIBRATE_END         =  0x05
-        val  SET_PASSCODE         =  0x06
-        val GET_PASSCODE_STATE    =  0x07
-        val SET_DISABLE_CAL_CORR  =  0x08
-        val  GET_DISABLE_CAL_CORR =  0x09
-        val CAL_CLEAR_TEMP_LUT    =  0x0A
-        val CAL_SET_TEMP_LUT_VAL  =  0x0B
-        val CAL_SAVE_TEMP_LUT     =  0x0C
-        val UPDATE_GET_MEM        =  0x70
+        const val UPDATE_READ_PTR       =  0x00
+        const val BLINK_LED             =  0x01
+        const val ENTER_DFU             =  0x02
+        const val CALIBRATE_GYRO        =  0x03
+        const val CALIBRATE_COMPASS     =  0x04
+        const val CALIBRATE_END         =  0x05
+        const val  SET_PASSCODE         =  0x06
+        const val GET_PASSCODE_STATE    =  0x07
+        const val SET_DISABLE_CAL_CORR  =  0x08
+        const val  GET_DISABLE_CAL_CORR =  0x09
+        const val CAL_CLEAR_TEMP_LUT    =  0x0A
+        const val CAL_SET_TEMP_LUT_VAL  =  0x0B
+        const val CAL_SAVE_TEMP_LUT     =  0x0C
+        const val UPDATE_GET_MEM        =  0x70
         // fmt: on
     }
 }
@@ -82,16 +82,16 @@ class CMD_RESP {
 
     companion object {
         //fmt: off
-        val SUCCESS                     =  0x00
-        val ERROR                       =  0x01
-        val ERROR_PASSCODE_FORMAT       =  0x02
-        val ERROR_COMPASS_NO_MOTION     =  0x03
-        val ERROR_COMPASS_LARGE_MAGNET  =  0x04
-        val ERROR_ACCESS_DENIED         =  0x05
-        val ERROR_UNKNOWN_CMD           =  0x06
-        val COMPLETE                    =  0x80
-        val ERROR_CALIBRATION           =  0x81
-        val PROGRESS                    =  0x82
+        const val SUCCESS                     =  0x00
+        const val ERROR                       =  0x01
+        const val ERROR_PASSCODE_FORMAT       =  0x02
+        const val ERROR_COMPASS_NO_MOTION     =  0x03
+        const val ERROR_COMPASS_LARGE_MAGNET  =  0x04
+        const val ERROR_ACCESS_DENIED         =  0x05
+        const val ERROR_UNKNOWN_CMD           =  0x06
+        const val COMPLETE                    =  0x80
+        const val ERROR_CALIBRATION           =  0x81
+        const val PROGRESS                    =  0x82
         // fmt: on
     }
 }
@@ -102,10 +102,10 @@ class PASSCODE_STATUS {
 
     companion object {
         // fmt: off
-        val INIT       = 0x00 // the unit has not been configured yet
-        val UNVERIFIED = 0x01 // correct password has not been entered yet
-        val VERIFIED   = 0x02 // correct password has been entered
-        val DISABLED   = 0x03 // no password is needed
+        const val INIT       = 0x00 // the unit has not been configured yet
+        const val UNVERIFIED = 0x01 // correct password has not been entered yet
+        const val VERIFIED   = 0x02 // correct password has been entered
+        const val DISABLED   = 0x03 // no password is needed
         // fmt: on
     }
 }

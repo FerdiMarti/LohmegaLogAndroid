@@ -54,7 +54,7 @@
                 android:textSize="15sp"/>
         </LinearLayout>
         <LinearLayout
-            android:id="@+id/battvol_view"
+            android:id="@+id/battery_voltage_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -68,7 +68,7 @@
                 android:textSize="15sp"/>
 
             <TextView
-                android:id="@+id/rtd_battvol_value"
+                android:id="@+id/rtd_battery_voltage_value"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
@@ -98,7 +98,7 @@
                 android:textSize="15sp"/>
         </LinearLayout>
         <LinearLayout
-            android:id="@+id/magn_view"
+            android:id="@+id/magnetometer_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -112,7 +112,7 @@
                 android:textSize="15sp"/>
 
             <TextView
-                android:id="@+id/rtd_magn_value"
+                android:id="@+id/rtd_magnetometer_value"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"

@@ -1,7 +1,6 @@
 package com.example.lohmegalog.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -101,8 +100,8 @@ class DeviceActivity : AppCompatActivity() {
         rtdSwitch?.setOnCheckedChangeListener { _, isChecked -> switchChanged(isChecked)}
         accelerationView = findViewById(R.id.acc_view)
         illuminanceView = findViewById(R.id.illuminance_view)
-        batteryVolView = findViewById(R.id.battvol_view)
-        magnetometerView = findViewById(R.id.magn_view)
+        batteryVolView = findViewById(R.id.battery_voltage_view)
+        magnetometerView = findViewById(R.id.magnetometer_view)
         pressureView = findViewById(R.id.pressure_view)
         humidityView = findViewById(R.id.humidity_view)
         rotView = findViewById(R.id.rot_view)
@@ -113,8 +112,8 @@ class DeviceActivity : AppCompatActivity() {
 
         accelerationTextView = findViewById(R.id.rtd_acc_value)
         illuminanceTextView = findViewById(R.id.rtd_illuminance_value)
-        batteryVolTextView = findViewById(R.id.rtd_battvol_value)
-        magnetometerTextView = findViewById(R.id.rtd_magn_value)
+        batteryVolTextView = findViewById(R.id.rtd_battery_voltage_value)
+        magnetometerTextView = findViewById(R.id.rtd_magnetometer_value)
         pressureTextView = findViewById(R.id.rtd_pressure_value)
         humidityTextView = findViewById(R.id.rtd_humidity_value)
         rotTextView = findViewById(R.id.rtd_rot_value)
