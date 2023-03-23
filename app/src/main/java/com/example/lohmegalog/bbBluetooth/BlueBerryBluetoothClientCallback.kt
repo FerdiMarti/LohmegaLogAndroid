@@ -12,6 +12,10 @@ abstract class BlueBerryBluetoothClientCallback {
         throw java.lang.RuntimeException("Stub!")
     }
 
+    open fun onConnectionError() {
+        throw java.lang.RuntimeException("Stub!")
+    }
+
     open fun onDisconnect() {
         throw java.lang.RuntimeException("Stub!")
     }

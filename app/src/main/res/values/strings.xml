@@ -24,5 +24,7 @@
     <string name="dialog_no">Cancel</string>
     <string name="dialog_confirm">OK</string>
     <string name="info_dialog_title">Information</string>
-    <string name="connection_timeout_info">Could not connect to device. Please try again.</string>
+    <string name="connection_timeout_text">Connection timed out. Please try again.</string>
+    <string name="connection_error_text">Something went wrong. Please try again.</string>
+    <string name="device_disconnected_text">Device Disconnected. Please try again.</string>
 </resources>

@@ -8,10 +8,8 @@ import android.os.Looper
 import android.util.Log
 import com.example.lohmegalog.CCC_DESCRIPTOR_UUID
 import com.example.lohmegalog.CMD_OPCODE
-import com.example.lohmegalog.R
 import com.example.lohmegalog.UUIDS
 import java.util.*
-import kotlin.concurrent.timerTask
 
 @SuppressLint("MissingPermission")
 class BlueBerryBluetoothClient constructor(
@@ -21,6 +19,7 @@ class BlueBerryBluetoothClient constructor(
     companion object {
         const val GATT_MAX_MTU_SIZE = 517
         const val CONNECTION_TIMEOUT_AFTER: Long = 20000
+        const val TAG = "BlueBerryClient"
     }
 
     private val bluetoothAdapter: BluetoothAdapter by lazy(LazyThreadSafetyMode.NONE) {
@@ -31,7 +30,7 @@ class BlueBerryBluetoothClient constructor(
     private var bluetoothGatt: BluetoothGatt? = null
     private var deviceCharacteristics: HashMap<String, BluetoothGattCharacteristic> = HashMap()
     private var bbDeserializer = BlueBerryDeserializer()
-    private var isConnected = false
+    private var connectionTimeoutHandler = Handler(Looper.getMainLooper())
 
     fun openConnection(address: String) {
         closeConnection()
@@ -40,16 +39,15 @@ class BlueBerryBluetoothClient constructor(
             bluetoothGatt = device?.connectGatt(context, false, bluetoothGattCallback)
             checkForTimeout()
         } catch (exception: IllegalArgumentException) {
-            Log.w("TAG", "Device not found with provided address. Unable to connect.")
+            Log.e(TAG, "Device not found with provided address. Unable to connect.")
+            throw exception
         }
     }
 
-    fun checkForTimeout() {
-        Handler(Looper.getMainLooper()).postDelayed({
-            if (!isConnected) {
-                closeConnection()
-                bbcCallback.onConnectTimeout()
-            }
+    private fun checkForTimeout() {
+        connectionTimeoutHandler.postDelayed({
+            closeConnection()
+            bbcCallback.onConnectTimeout()
         }, CONNECTION_TIMEOUT_AFTER)
     }
 
@@ -65,33 +63,32 @@ class BlueBerryBluetoothClient constructor(
     private val bluetoothGattCallback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-                isConnected = true
-                Log.d("CONNECTION", "CONNECTED")
+                connectionTimeoutHandler.removeCallbacksAndMessages(null)
+                Log.d(TAG, "Connected to Device")
                 gatt?.discoverServices()
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                isConnected = false
-                Log.d("CONNECTION", "DISCONNECTED")
+                Log.d(TAG, "Disconnected from Device")
                 bbcCallback.onDisconnect()
             }
         }
 
         override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.d("GATT_SUCCESS", "Got Services")
                 gatt?.requestMtu(GATT_MAX_MTU_SIZE)
             } else {
-                Log.d("GATT", "onServicesDiscovered received: $status")
+                Log.d(TAG, "Receiving GATT Services Failed")
+                bbcCallback.onConnectionError()
             }
         }
 
         override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.d("GATT", "Changed MTU")
+                Log.d(TAG, "Changed MTU")
             } else {
-                Log.d("GATT", "onMTUChange received: $status")
+                Log.d(TAG, "onMTUChange received: $status")
             }
             bbcCallback.onConnect()
-            getGattServices(gatt?.services)
+            storeGattServices(gatt?.services)
             readDeviceBattery()
             readDeviceRssi()
         }
@@ -139,9 +136,9 @@ class BlueBerryBluetoothClient constructor(
             status: Int
         ) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.d("WRITE", "WRITE SUCCESS")
+                Log.d(TAG, "Characteristics Write Success")
             } else {
-                Log.d("WRITE", "WRITE FAILED")
+                Log.d(TAG, "Characteristics Write Failed")
             }
         }
 
@@ -151,14 +148,14 @@ class BlueBerryBluetoothClient constructor(
             status: Int
         ) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.d("DESCRIPTOR_WRITE", "WRITE SUCCESS")
+                Log.d(TAG, "Descriptor Write Success")
             } else {
-                Log.d("DESCRIPTOR_WRITE", "WRITE FAILED")
+                Log.d(TAG, "Descriptor Write Success")
             }
         }
     }
 
-    private fun getGattServices(gattServices: List<BluetoothGattService>?) {
+    private fun storeGattServices(gattServices: List<BluetoothGattService>?) {
         if (gattServices == null) return
         val characteristics: HashMap<String, BluetoothGattCharacteristic> = HashMap()
 
@@ -175,8 +172,7 @@ class BlueBerryBluetoothClient constructor(
     fun blinkDevice() {
         val chara = deviceCharacteristics[UUIDS.C_CMD_TX]
         if (chara == null) {
-            //TODO
-            return
+            throw IllegalStateException("Characteristic does not exist")
         }
         chara.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
         val data = ByteArray(1)
@@ -188,24 +184,21 @@ class BlueBerryBluetoothClient constructor(
     fun readDeviceBattery() {
         val chara = deviceCharacteristics[UUIDS.C_BATTERY_LEVEL]
         if (chara == null) {
-            //TODO
-            return
+            throw IllegalStateException("Characteristic does not exist")
         }
         readCharacteristic(chara)
     }
 
     fun readDeviceRssi() {
         bluetoothGatt?.readRemoteRssi() ?: run {
-            Log.w("TAG", "BluetoothGatt not initialized")
-            return
+            throw IllegalStateException("Gatt not Initialized")
         }
     }
 
     fun subscribeToRTD() {
         val chara = deviceCharacteristics[UUIDS.C_SENSORS_RTD]
         if (chara == null) {
-            //TODO
-            return
+            throw IllegalStateException("Characteristic does not exist")
         }
         enableNotifications(chara)
     }
@@ -213,41 +206,38 @@ class BlueBerryBluetoothClient constructor(
     fun unsubscribeFromRTD() {
         val chara = deviceCharacteristics[UUIDS.C_SENSORS_RTD]
         if (chara == null) {
-            //TODO
-            return
+            throw IllegalStateException("Characteristic does not exist")
         }
         disableNotifications(chara)
     }
 
-    fun readCharacteristic(characteristic: BluetoothGattCharacteristic) {
+    private fun readCharacteristic(characteristic: BluetoothGattCharacteristic) {
         bluetoothGatt?.readCharacteristic(characteristic) ?: run {
-            Log.w("TAG", "BluetoothGatt not initialized")
-            return
+            throw IllegalStateException("Gatt not Initialized")
         }
     }
 
-    fun writeCharacteristic(characteristic: BluetoothGattCharacteristic) {
+    private fun writeCharacteristic(characteristic: BluetoothGattCharacteristic) {
         bluetoothGatt?.writeCharacteristic(characteristic) ?: run {
-            Log.w("TAG", "BluetoothGatt not initialized")
-            return
+            throw IllegalStateException("Gatt not Initialized")
         }
     }
 
-    fun writeDescriptor(descriptor: BluetoothGattDescriptor, payload: ByteArray) {
+    private fun writeDescriptor(descriptor: BluetoothGattDescriptor, payload: ByteArray) {
         bluetoothGatt?.let { gatt ->
             descriptor.value = payload
             gatt.writeDescriptor(descriptor)
-        } ?: error("Not connected to a BLE device!")
+        } ?: throw IllegalStateException("Gatt not Initialized")
     }
 
-    fun enableNotifications(characteristic: BluetoothGattCharacteristic) {
+    private fun enableNotifications(characteristic: BluetoothGattCharacteristic) {
         val cccdUuid = UUID.fromString(CCC_DESCRIPTOR_UUID)
         val payload = when {
             characteristic.isIndicatable() -> BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
             characteristic.isNotifiable() -> BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
             else -> {
                 Log.e(
-                    "ConnectionManager",
+                    TAG,
                     "${characteristic.uuid} doesn't support notifications/indications"
                 )
                 return
@@ -257,22 +247,22 @@ class BlueBerryBluetoothClient constructor(
         characteristic.getDescriptor(cccdUuid)?.let { cccDescriptor ->
             if (bluetoothGatt?.setCharacteristicNotification(characteristic, true) == false) {
                 Log.e(
-                    "ConnectionManager",
+                    TAG,
                     "setCharacteristicNotification failed for ${characteristic.uuid}"
                 )
                 return
             }
             writeDescriptor(cccDescriptor, payload)
         } ?: Log.e(
-            "ConnectionManager",
+            TAG,
             "${characteristic.uuid} doesn't contain the CCC descriptor!"
         )
     }
 
-    fun disableNotifications(characteristic: BluetoothGattCharacteristic) {
+    private fun disableNotifications(characteristic: BluetoothGattCharacteristic) {
         if (!characteristic.isNotifiable() && !characteristic.isIndicatable()) {
             Log.e(
-                "ConnectionManager",
+                TAG,
                 "${characteristic.uuid} doesn't support indications/notifications"
             )
             return
@@ -282,14 +272,14 @@ class BlueBerryBluetoothClient constructor(
         characteristic.getDescriptor(cccdUuid)?.let { cccDescriptor ->
             if (bluetoothGatt?.setCharacteristicNotification(characteristic, false) == false) {
                 Log.e(
-                    "ConnectionManager",
+                    TAG,
                     "setCharacteristicNotification failed for ${characteristic.uuid}"
                 )
                 return
             }
             writeDescriptor(cccDescriptor, BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE)
         } ?: Log.e(
-            "ConnectionManager",
+            TAG,
             "${characteristic.uuid} doesn't contain the CCC descriptor!"
         )
     }
@@ -297,7 +287,7 @@ class BlueBerryBluetoothClient constructor(
     private fun BluetoothGatt.printGattTable() {
         if (services.isEmpty()) {
             Log.i(
-                "printGattTable",
+                TAG,
                 "No service and characteristic available, call discoverServices() first?"
             )
             return
@@ -313,7 +303,7 @@ class BlueBerryBluetoothClient constructor(
                 ) { de -> de.uuid.toString() }
             }
             Log.i(
-                "printGattTable",
+                TAG,
                 "\nService ${service.uuid}\nCharacteristics:\n$characteristicsTable"
             )
         }

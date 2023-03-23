@@ -1,6 +1,7 @@
 package com.example.lohmegalog.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -25,6 +26,7 @@ import kotlin.math.roundToInt
 class DeviceActivity : AppCompatActivity() {
     companion object {
         const val ADDRESS_INTENT_KEY = "device_address"
+        const val STATUS_UPDATE_INTERVAL: Long = 2000
     }
 
     //Header UI Elements
@@ -142,7 +144,11 @@ class DeviceActivity : AppCompatActivity() {
             throw Exception("No device address given")
         }
         setConnectProgressBarVisible()
-        bbc?.openConnection(deviceAddress)
+        try {
+            bbc?.openConnection(deviceAddress)
+        } catch (e: Exception) {
+            onConnectionError()
+        }
     }
 
     private fun disconnectDevice() {
@@ -152,16 +158,38 @@ class DeviceActivity : AppCompatActivity() {
 
     private fun blinkDevice() {
         setBlinkButtonPressed()
-        bbc?.blinkDevice()
+        try {
+            bbc?.blinkDevice()
+        } catch (exception: IllegalStateException) {
+            onConnectionError()
+        }
     }
 
     private fun subscribeToRTD() {
         this.firstRTD = true
-        bbc?.subscribeToRTD()
+        try {
+            bbc?.subscribeToRTD()
+        } catch (exception: IllegalStateException) {
+            onConnectionError()
+        }
     }
 
     private fun unsubscribeFromRTD() {
-        bbc?.unsubscribeFromRTD()
+        try {
+            bbc?.unsubscribeFromRTD()
+        } catch (exception: IllegalStateException) {
+            onConnectionError()
+        }
+    }
+
+    private fun readStatus() {
+        try {
+            //TODO only one works
+            bbc?.readDeviceBattery()
+            bbc?.readDeviceRssi()
+        } catch (exception: IllegalStateException) {
+            onConnectionError()
+        }
     }
 
     private fun startStatusTimer() {
@@ -170,10 +198,8 @@ class DeviceActivity : AppCompatActivity() {
         }
         this.statusTimer = Timer()
         statusTimer!!.schedule(timerTask {
-            //TODO only one works
-            bbc?.readDeviceBattery()
-            bbc?.readDeviceRssi()
-        }, 2000, 2000)
+            readStatus()
+        }, STATUS_UPDATE_INTERVAL, STATUS_UPDATE_INTERVAL)
     }
 
     private fun invalidateStatusTimer() {
@@ -193,11 +219,17 @@ class DeviceActivity : AppCompatActivity() {
         override fun onConnectTimeout() {
             disconnectDevice()
             setUIDisconnected()
-            showInfoDialog(getString(R.string.connection_timeout_info))
+            showInfoDialog(getString(R.string.connection_timeout_text))
+        }
+
+        override fun onConnectionError() {
+            onConnectionError()
         }
 
         override fun onDisconnect() {
             setUIDisconnected()
+            invalidateStatusTimer()
+            showInfoDialog(getString(R.string.device_disconnected_text))
         }
 
         override fun onReceivedBattery(success: Boolean, batteryLevel: Int?) {
@@ -217,6 +249,12 @@ class DeviceActivity : AppCompatActivity() {
                 updateRtd(data)
             }
         }
+    }
+
+    private fun onConnectionError() {
+        disconnectDevice()
+        setUIDisconnected()
+        showInfoDialog(getString(R.string.connection_error_text))
     }
 
     private fun updateBattery(batteryLevel: Int) {
