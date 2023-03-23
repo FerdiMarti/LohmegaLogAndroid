@@ -19,4 +19,8 @@
     <string name="device_blink_available">Blink</string>
     <string name="device_battery_level">%1$s%%</string>
     <string name="device_rssi">%1$s db</string>
+    <string name="permission_dialog_title">Please Grant Permissions</string>
+    <string name="permission_dialog_text">Location permission are required for Bluetooth Low Energy connections.</string>
+    <string name="dialog_no">Cancel</string>
+    <string name="dialog_confirm">OK</string>
 </resources>

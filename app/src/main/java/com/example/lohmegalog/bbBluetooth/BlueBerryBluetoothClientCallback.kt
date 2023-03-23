@@ -1,4 +1,4 @@
-package com.example.lohmegalog.BBBluetooth
+package com.example.lohmegalog.bbBluetooth
 
 import com.example.lohmegalog.protobuf.BbLogEntry
 

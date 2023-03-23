@@ -1,4 +1,4 @@
-package com.example.lohmegalog.BBBluetooth
+package com.example.lohmegalog.bbBluetooth
 
 import android.annotation.SuppressLint
 import android.bluetooth.*
@@ -8,16 +8,19 @@ import com.example.lohmegalog.CCC_DESCRIPTOR_UUID
 import com.example.lohmegalog.CMD_OPCODE
 import com.example.lohmegalog.UUIDS
 import java.util.*
-import kotlin.collections.HashMap
 
 @SuppressLint("MissingPermission")
-class BlueBerryBluetoothClient constructor(private val context: Context, private val bbcCallback: BlueBerryBluetoothClientCallback) {
+class BlueBerryBluetoothClient constructor(
+    private val context: Context,
+    private val bbcCallback: BlueBerryBluetoothClientCallback
+) {
     companion object {
         const val GATT_MAX_MTU_SIZE = 517
     }
 
     private val bluetoothAdapter: BluetoothAdapter by lazy(LazyThreadSafetyMode.NONE) {
-        val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        val bluetoothManager =
+            context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothManager.adapter
     }
     private var bluetoothGatt: BluetoothGatt? = null
@@ -74,7 +77,11 @@ class BlueBerryBluetoothClient constructor(private val context: Context, private
             readDeviceRssi()
         }
 
-        override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
+        override fun onCharacteristicRead(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            status: Int
+        ) {
             val uuid = characteristic.uuid.toString()
             if (uuid == UUIDS.C_BATTERY_LEVEL) {
                 if (status == BluetoothGatt.GATT_SUCCESS) {
@@ -94,7 +101,10 @@ class BlueBerryBluetoothClient constructor(private val context: Context, private
             }
         }
 
-        override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic
+        ) {
             val uuid = characteristic.uuid.toString()
             if (uuid == UUIDS.C_SENSORS_RTD) {
                 val entry = bbDeserializer.processData(characteristic.value)
@@ -104,7 +114,11 @@ class BlueBerryBluetoothClient constructor(private val context: Context, private
             }
         }
 
-        override fun onCharacteristicWrite(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?, status: Int) {
+        override fun onCharacteristicWrite(
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic?,
+            status: Int
+        ) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Log.d("WRITE", "WRITE SUCCESS")
             } else {
@@ -112,7 +126,11 @@ class BlueBerryBluetoothClient constructor(private val context: Context, private
             }
         }
 
-        override fun onDescriptorWrite(gatt: BluetoothGatt?, descriptor: BluetoothGattDescriptor?, status: Int) {
+        override fun onDescriptorWrite(
+            gatt: BluetoothGatt?,
+            descriptor: BluetoothGattDescriptor?,
+            status: Int
+        ) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Log.d("DESCRIPTOR_WRITE", "WRITE SUCCESS")
             } else {
@@ -209,51 +227,75 @@ class BlueBerryBluetoothClient constructor(private val context: Context, private
             characteristic.isIndicatable() -> BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
             characteristic.isNotifiable() -> BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
             else -> {
-                Log.e("ConnectionManager", "${characteristic.uuid} doesn't support notifications/indications")
+                Log.e(
+                    "ConnectionManager",
+                    "${characteristic.uuid} doesn't support notifications/indications"
+                )
                 return
             }
         }
 
         characteristic.getDescriptor(cccdUuid)?.let { cccDescriptor ->
             if (bluetoothGatt?.setCharacteristicNotification(characteristic, true) == false) {
-                Log.e("ConnectionManager", "setCharacteristicNotification failed for ${characteristic.uuid}")
+                Log.e(
+                    "ConnectionManager",
+                    "setCharacteristicNotification failed for ${characteristic.uuid}"
+                )
                 return
             }
             writeDescriptor(cccDescriptor, payload)
-        } ?: Log.e("ConnectionManager", "${characteristic.uuid} doesn't contain the CCC descriptor!")
+        } ?: Log.e(
+            "ConnectionManager",
+            "${characteristic.uuid} doesn't contain the CCC descriptor!"
+        )
     }
 
     fun disableNotifications(characteristic: BluetoothGattCharacteristic) {
         if (!characteristic.isNotifiable() && !characteristic.isIndicatable()) {
-            Log.e("ConnectionManager", "${characteristic.uuid} doesn't support indications/notifications")
+            Log.e(
+                "ConnectionManager",
+                "${characteristic.uuid} doesn't support indications/notifications"
+            )
             return
         }
 
         val cccdUuid = UUID.fromString(CCC_DESCRIPTOR_UUID)
         characteristic.getDescriptor(cccdUuid)?.let { cccDescriptor ->
             if (bluetoothGatt?.setCharacteristicNotification(characteristic, false) == false) {
-                Log.e("ConnectionManager", "setCharacteristicNotification failed for ${characteristic.uuid}")
+                Log.e(
+                    "ConnectionManager",
+                    "setCharacteristicNotification failed for ${characteristic.uuid}"
+                )
                 return
             }
             writeDescriptor(cccDescriptor, BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE)
-        } ?: Log.e("ConnectionManager", "${characteristic.uuid} doesn't contain the CCC descriptor!")
+        } ?: Log.e(
+            "ConnectionManager",
+            "${characteristic.uuid} doesn't contain the CCC descriptor!"
+        )
     }
 
     private fun BluetoothGatt.printGattTable() {
         if (services.isEmpty()) {
-            Log.i("printGattTable", "No service and characteristic available, call discoverServices() first?")
+            Log.i(
+                "printGattTable",
+                "No service and characteristic available, call discoverServices() first?"
+            )
             return
         }
         services.forEach { service ->
             val characteristicsTable = service.characteristics.joinToString(
                 separator = "\n|--",
                 prefix = "|--"
-            ) { it.uuid.toString() + ": " + it.isIndicatable() + ", " + it.isNotifiable() + "\n\tDescriptors:" + it.descriptors.joinToString(
-                separator = "\n|--",
-                prefix = "|--"
-            ) {de -> de.uuid.toString()}
+            ) {
+                it.uuid.toString() + ": " + it.isIndicatable() + ", " + it.isNotifiable() + "\n\tDescriptors:" + it.descriptors.joinToString(
+                    separator = "\n|--",
+                    prefix = "|--"
+                ) { de -> de.uuid.toString() }
             }
-            Log.i("printGattTable", "\nService ${service.uuid}\nCharacteristics:\n$characteristicsTable"
+            Log.i(
+                "printGattTable",
+                "\nService ${service.uuid}\nCharacteristics:\n$characteristicsTable"
             )
         }
     }

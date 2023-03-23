@@ -1,4 +1,5 @@
 package com.example.lohmegalog.ui
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -6,7 +7,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lohmegalog.R
 
-class ScanResultAdapter(private val scanResults: List<ScanResultData>, private val onClickListener: OnClickListener) : RecyclerView.Adapter<ScanResultAdapter.ViewHolder>() {
+class ScanResultAdapter(
+    private val scanResults: List<ScanResultData>,
+    private val onClickListener: OnClickListener
+) : RecyclerView.Adapter<ScanResultAdapter.ViewHolder>() {
 
     // create new views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -20,14 +24,12 @@ class ScanResultAdapter(private val scanResults: List<ScanResultData>, private v
 
     // binds the list items to a view
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
         val data = scanResults[position]
         holder.textView.text = data.address
 
         holder.itemView.setOnClickListener {
             onClickListener.onClick(data)
         }
-
     }
 
     // return the number of the items in the list

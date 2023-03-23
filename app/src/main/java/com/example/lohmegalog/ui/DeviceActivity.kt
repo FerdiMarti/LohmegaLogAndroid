@@ -2,14 +2,17 @@ package com.example.lohmegalog.ui
 
 import android.os.Bundle
 import android.view.View
-import android.widget.*
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
-import com.example.lohmegalog.BBBluetooth.BlueBerryBluetoothClient
-import com.example.lohmegalog.BBBluetooth.BlueBerryBluetoothClientCallback
+import com.example.lohmegalog.bbBluetooth.BlueBerryBluetoothClient
+import com.example.lohmegalog.bbBluetooth.BlueBerryBluetoothClientCallback
+import com.example.lohmegalog.BlueBerryLogEntryField
 import com.example.lohmegalog.BlueBerryLogEntryFields
 import com.example.lohmegalog.R
-import com.example.lohmegalog.BlueBerryLogEntryField
 import com.example.lohmegalog.protobuf.BbLogEntry
 import com.google.android.material.switchmaterial.SwitchMaterial
 import java.util.*
@@ -176,9 +179,9 @@ class DeviceActivity : AppCompatActivity() {
     }
 
     private fun setRTDProgressBarGone() {
-       runOnUiThread {
-           rtdProgressBar?.visibility = View.GONE
-       }
+        runOnUiThread {
+            rtdProgressBar?.visibility = View.GONE
+        }
     }
 
     private fun setUIConnected() {
@@ -235,7 +238,8 @@ class DeviceActivity : AppCompatActivity() {
     }
 
     private fun connectToDevice(deviceAddress: String?) {
-        if (deviceAddress == null) {}//TODO
+        if (deviceAddress == null) {
+        }//TODO
         setConnectProgressBarVisible()
         bbc?.openConnection(deviceAddress!!)
     }
@@ -301,7 +305,7 @@ class DeviceActivity : AppCompatActivity() {
             rssiTV?.text = getString(R.string.device_rssi, rssi.toString())
         }
     }
-    
+
     private fun updateRtd(data: BbLogEntry.bb_log_entry) {
         runOnUiThread {
             if (firstRTD) {
@@ -313,7 +317,8 @@ class DeviceActivity : AppCompatActivity() {
                 BlueBerryLogEntryFields.ACCELEROMETER,
                 data.accelerometerList
             )
-            batteryVolTV?.text = constructFieldString(BlueBerryLogEntryFields.BATVOLT, data.batteryMv)
+            batteryVolTV?.text =
+                constructFieldString(BlueBerryLogEntryFields.BATVOLT, data.batteryMv)
             illuminanceTV?.text = constructFieldString(BlueBerryLogEntryFields.LUX, data.lux)
             magnetometerTV?.text =
                 constructFieldListString(BlueBerryLogEntryFields.COMPASS, data.compassList)
@@ -345,7 +350,7 @@ class DeviceActivity : AppCompatActivity() {
 
     private fun selectBatteryImage(batteryLevel: Int): Int {
         val percentagePerStep = 100 / 7
-        return when(batteryLevel / percentagePerStep) {
+        return when (batteryLevel / percentagePerStep) {
             0 -> R.drawable.battery_1bar
             1 -> R.drawable.battery_1bar
             2 -> R.drawable.battery_2bar
@@ -360,7 +365,7 @@ class DeviceActivity : AppCompatActivity() {
 
     private fun selectRssiImage(rssi: Int): Int {
         val dbPerStep = -100.0 / 5.0
-        return when((rssi / dbPerStep).roundToInt()) {
+        return when ((rssi / dbPerStep).roundToInt()) {
             0 -> R.drawable.rssi_full
             1 -> R.drawable.rssi_full
             2 -> R.drawable.rssi_4bar
