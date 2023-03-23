@@ -1,9 +1,11 @@
 package com.example.lohmegalog.ui
 
 import android.Manifest
+import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -119,21 +121,40 @@ class ScanActivity : AppCompatActivity() {
         builder.show()
     }
 
+    private fun promptEnableBluetooth() {
+        val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+        ActivityCompat.startActivityForResult(this, enableBtIntent, 1, null)
+    }
+
     private fun startScan() {
         if (!checkBLEPermissions()) return
         clearScanResults()
         setScanningUI()
-        bbDiscoverer.scanLe(true, {
+        try {
+            bbDiscoverer.scanLe(true, {
+                setStopUI()
+            }, { result ->
+                addScanResult(result)
+            })
+        } catch (e: java.lang.IllegalArgumentException) {
             setStopUI()
-        }, { result ->
-            addScanResult(result)
-        })
+            Log.e(TAG, "Exception while scanning $e")
+        } catch (e: IllegalStateException) {
+            setStopUI()
+            promptEnableBluetooth()
+        }
+
     }
 
     private fun stopScan() {
-        bbDiscoverer.scanLe(false, {
+        try {
+            bbDiscoverer.scanLe(false, {
+                setStopUI()
+            }, null)
+        } catch (e: IllegalStateException) {
             setStopUI()
-        }, null)
+            promptEnableBluetooth()
+        }
     }
 
     private fun addScanResult(result: ScanResultData) {
@@ -149,18 +170,23 @@ class ScanActivity : AppCompatActivity() {
     }
 
     private fun setScanningUI() {
-        stopScanButton?.isVisible = true
-        rescanButton?.isVisible = false
-        progressBar?.visibility = View.VISIBLE
+        runOnUiThread {
+            stopScanButton?.isVisible = true
+            rescanButton?.isVisible = false
+            progressBar?.visibility = View.VISIBLE
+        }
     }
 
     private fun setStopUI() {
-        stopScanButton?.isVisible = false
-        rescanButton?.isVisible = true
-        progressBar?.visibility = View.GONE
+        runOnUiThread {
+            stopScanButton?.isVisible = false
+            rescanButton?.isVisible = true
+            progressBar?.visibility = View.GONE
+        }
     }
 
     companion object {
         private const val FINE_LOCATION_PERMISSION_REQUEST = 1001
+        private const val TAG = "SCAN_ACTIVITY"
     }
 }

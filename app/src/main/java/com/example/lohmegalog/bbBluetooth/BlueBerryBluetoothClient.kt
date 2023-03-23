@@ -3,11 +3,15 @@ package com.example.lohmegalog.bbBluetooth
 import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.example.lohmegalog.CCC_DESCRIPTOR_UUID
 import com.example.lohmegalog.CMD_OPCODE
+import com.example.lohmegalog.R
 import com.example.lohmegalog.UUIDS
 import java.util.*
+import kotlin.concurrent.timerTask
 
 @SuppressLint("MissingPermission")
 class BlueBerryBluetoothClient constructor(
@@ -16,6 +20,7 @@ class BlueBerryBluetoothClient constructor(
 ) {
     companion object {
         const val GATT_MAX_MTU_SIZE = 517
+        const val CONNECTION_TIMEOUT_AFTER: Long = 20000
     }
 
     private val bluetoothAdapter: BluetoothAdapter by lazy(LazyThreadSafetyMode.NONE) {
@@ -24,33 +29,47 @@ class BlueBerryBluetoothClient constructor(
         bluetoothManager.adapter
     }
     private var bluetoothGatt: BluetoothGatt? = null
-    private var characteristics: HashMap<String, BluetoothGattCharacteristic> = HashMap()
+    private var deviceCharacteristics: HashMap<String, BluetoothGattCharacteristic> = HashMap()
     private var bbDeserializer = BlueBerryDeserializer()
+    private var isConnected = false
 
     fun openConnection(address: String) {
         closeConnection()
         try {
             val device = bluetoothAdapter.getRemoteDevice(address)
             bluetoothGatt = device?.connectGatt(context, false, bluetoothGattCallback)
+            checkForTimeout()
         } catch (exception: IllegalArgumentException) {
-            Log.w("TAG", "Device not found with provided address.  Unable to connect.")
+            Log.w("TAG", "Device not found with provided address. Unable to connect.")
         }
+    }
+
+    fun checkForTimeout() {
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (!isConnected) {
+                closeConnection()
+                bbcCallback.onConnectTimeout()
+            }
+        }, CONNECTION_TIMEOUT_AFTER)
     }
 
     fun closeConnection() {
         bluetoothGatt?.let { gatt ->
             gatt.close()
             bluetoothGatt = null
-            characteristics = HashMap()
+            deviceCharacteristics = HashMap()
+            bbDeserializer = BlueBerryDeserializer()
         }
     }
 
     private val bluetoothGattCallback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
+                isConnected = true
                 Log.d("CONNECTION", "CONNECTED")
                 gatt?.discoverServices()
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                isConnected = false
                 Log.d("CONNECTION", "DISCONNECTED")
                 bbcCallback.onDisconnect()
             }
@@ -150,11 +169,11 @@ class BlueBerryBluetoothClient constructor(
                 characteristics[cUuid] = gattCharacteristic
             }
         }
-        this.characteristics = characteristics
+        this.deviceCharacteristics = characteristics
     }
 
     fun blinkDevice() {
-        val chara = characteristics[UUIDS.C_CMD_TX]
+        val chara = deviceCharacteristics[UUIDS.C_CMD_TX]
         if (chara == null) {
             //TODO
             return
@@ -167,7 +186,7 @@ class BlueBerryBluetoothClient constructor(
     }
 
     fun readDeviceBattery() {
-        val chara = characteristics[UUIDS.C_BATTERY_LEVEL]
+        val chara = deviceCharacteristics[UUIDS.C_BATTERY_LEVEL]
         if (chara == null) {
             //TODO
             return
@@ -183,7 +202,7 @@ class BlueBerryBluetoothClient constructor(
     }
 
     fun subscribeToRTD() {
-        val chara = characteristics[UUIDS.C_SENSORS_RTD]
+        val chara = deviceCharacteristics[UUIDS.C_SENSORS_RTD]
         if (chara == null) {
             //TODO
             return
@@ -192,7 +211,7 @@ class BlueBerryBluetoothClient constructor(
     }
 
     fun unsubscribeFromRTD() {
-        val chara = characteristics[UUIDS.C_SENSORS_RTD]
+        val chara = deviceCharacteristics[UUIDS.C_SENSORS_RTD]
         if (chara == null) {
             //TODO
             return

@@ -6,6 +6,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import com.example.lohmegalog.BlueBerryLogEntryField
@@ -187,6 +188,12 @@ class DeviceActivity : AppCompatActivity() {
         override fun onConnect() {
             startStatusTimer()
             setUIConnected()
+        }
+
+        override fun onConnectTimeout() {
+            disconnectDevice()
+            setUIDisconnected()
+            showInfoDialog(getString(R.string.connection_timeout_info))
         }
 
         override fun onDisconnect() {
@@ -397,6 +404,18 @@ class DeviceActivity : AppCompatActivity() {
 
     private fun constructFieldString(field: BlueBerryLogEntryField, data: Number): String {
         return field.tounit(data.toFloat()).round(3).toString() + " " + field.unit
+    }
+
+    private fun showInfoDialog(message: String) {
+        runOnUiThread {
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle(R.string.info_dialog_title)
+            builder.setMessage(message)
+            builder.setPositiveButton(R.string.dialog_confirm) { dialog, which ->
+                dialog.cancel()
+            }
+            builder.show()
+        }
     }
 
     private fun Float.round(decimals: Int): Float {

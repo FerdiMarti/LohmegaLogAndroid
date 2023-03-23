@@ -23,4 +23,6 @@
     <string name="permission_dialog_text">Location permission are required for Bluetooth Low Energy connections.</string>
     <string name="dialog_no">Cancel</string>
     <string name="dialog_confirm">OK</string>
+    <string name="info_dialog_title">Information</string>
+    <string name="connection_timeout_info">Could not connect to device. Please try again.</string>
 </resources>

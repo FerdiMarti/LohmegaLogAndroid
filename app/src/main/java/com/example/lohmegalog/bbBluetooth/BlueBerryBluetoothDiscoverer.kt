@@ -8,11 +8,9 @@ import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
-import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import androidx.core.app.ActivityCompat.startActivityForResult
 import com.example.lohmegalog.ui.ScanResultData
 
 
@@ -32,6 +30,7 @@ class BlueBerryBluetoothDiscoverer constructor(private var context: Activity) {
     }
 
     private var scanning: Boolean = false
+    private var stopScanHandler: Handler = Handler(Looper.getMainLooper())
 
     fun scanLe(
         enable: Boolean,
@@ -39,25 +38,13 @@ class BlueBerryBluetoothDiscoverer constructor(private var context: Activity) {
         resultCallback: ((result: ScanResultData) -> Unit)?
     ) {
         if (enable && resultCallback == null) {
-            throw Exception("Please specify a result callback")
-        }
-        if (promptEnableBluetooth()) {
-            //if Bluetooth was not enabled stop() and return
-            stop()
-            return
+            throw IllegalArgumentException("Please specify a result callback")
         }
         if (bluetoothAdapter.isEnabled) {
             scanLeDevice(enable, stop, resultCallback)
+        } else {
+            throw IllegalStateException("Bluetooth is not enabled.")
         }
-    }
-
-    private fun promptEnableBluetooth(): Boolean {
-        if (!bluetoothAdapter.isEnabled) {
-            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            startActivityForResult(context, enableBtIntent, 1, null)
-            return true
-        }
-        return false
     }
 
     var scanResultCallback: ((result: ScanResultData) -> Unit)? = null
@@ -70,7 +57,7 @@ class BlueBerryBluetoothDiscoverer constructor(private var context: Activity) {
         if (enable) {
             if (scanning) return
             // Stops scanning after a pre-defined scan period.
-            Handler(Looper.getMainLooper()).postDelayed({
+            stopScanHandler.postDelayed({
                 scanLeDevice(false, stop, null)
             }, SCAN_PERIOD)
             scanning = true
@@ -83,6 +70,7 @@ class BlueBerryBluetoothDiscoverer constructor(private var context: Activity) {
                 bluetoothAdapterScanCallback
             )
         } else {
+            stopScanHandler.removeCallbacksAndMessages(null)
             scanning = false
             bluetoothAdapter.bluetoothLeScanner?.stopScan(bluetoothAdapterScanCallback)
             scanResultCallback = null

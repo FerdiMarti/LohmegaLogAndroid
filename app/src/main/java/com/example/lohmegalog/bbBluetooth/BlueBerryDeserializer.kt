@@ -5,6 +5,10 @@ import com.example.lohmegalog.protobuf.BbLogEntry
 import java.io.EOFException
 
 class BlueBerryDeserializer {
+    companion object {
+        const val TAG = "BlueBerryDeserializer"
+    }
+
     private var buffer: ByteArray = ByteArray(0)
 
     private fun addToBuffer(data: ByteArray) {
@@ -32,20 +36,19 @@ class BlueBerryDeserializer {
     }
 
     fun processData(data: ByteArray): BbLogEntry.bb_log_entry? {
-        addToBuffer(data)
         try {
-            val entry = getNextEntry()
-            return entry
+            addToBuffer(data)
+            return getNextEntry()
         } catch (e: EOFException) {
-            Log.d("Deserialize", e.message!!)
+            return null
         } catch (e: java.lang.Exception) {
-            this.flush()
-            Log.d("Deserialize", e.message!!)
+            this.flushBuffer() //flush because content is flawed; only makes sense for real time data
+            Log.e(TAG, "Error while deserializing: " + e.message)
+            return null
         }
-        return null
     }
 
-    fun flush() {
+    fun flushBuffer() {
         this.buffer = ByteArray(0)
     }
 }
