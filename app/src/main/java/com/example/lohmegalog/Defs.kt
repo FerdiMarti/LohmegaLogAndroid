@@ -273,7 +273,7 @@ class BlueBerryLogEntryFields {
             txtfmt=null
         )
 
-        val BATVOLT = BlueBerryLogEntryField(
+        val BATTERY_VOLTAGE = BlueBerryLogEntryField(
             enmask=0x0200,
             pbname="battery_mv",
             symbol="bat",
