@@ -140,13 +140,20 @@ class DeviceActivity : AppCompatActivity() {
     }
 
     private fun connectToDevice(deviceAddress: String?) {
+        if (!BluetoothPermissions.checkBLEPermissions(this)) {
+            BluetoothPermissions.showPermissionsInfo(this)
+        }
+
         if (deviceAddress == null) {
             throw Exception("No device address given")
         }
         setConnectProgressBarVisible()
         try {
             bbc?.openConnection(deviceAddress)
-        } catch (e: Exception) {
+        } catch (exception: IllegalStateException) {
+            setUIDisconnected()
+            showInfoDialog("" + exception.message)
+        } catch (exception: Exception) {
             onConnectionError()
         }
     }

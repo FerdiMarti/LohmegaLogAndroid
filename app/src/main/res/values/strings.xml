@@ -27,4 +27,5 @@
     <string name="connection_timeout_text">Connection timed out. Please try again.</string>
     <string name="connection_error_text">Something went wrong. Please try again.</string>
     <string name="device_disconnected_text">Device Disconnected. Please try again.</string>
+    <string name="device_connection_failed">Connection Failed. Please Check if Bluetooth is enabled and try again.</string>
 </resources>

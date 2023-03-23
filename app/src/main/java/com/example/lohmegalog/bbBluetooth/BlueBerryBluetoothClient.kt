@@ -33,18 +33,21 @@ class BlueBerryBluetoothClient constructor(
     private var connectionTimeoutHandler = Handler(Looper.getMainLooper())
 
     fun openConnection(address: String) {
+        if (!bluetoothAdapter.isEnabled) {
+            throw IllegalStateException("Connection Failed. Bluetooth is not enabled.")
+        }
         closeConnection()
         try {
             val device = bluetoothAdapter.getRemoteDevice(address)
             bluetoothGatt = device?.connectGatt(context, false, bluetoothGattCallback)
-            checkForTimeout()
+            checkForConnectionTimeout()
         } catch (exception: IllegalArgumentException) {
             Log.e(TAG, "Device not found with provided address. Unable to connect.")
             throw exception
         }
     }
 
-    private fun checkForTimeout() {
+    private fun checkForConnectionTimeout() {
         connectionTimeoutHandler.postDelayed({
             closeConnection()
             bbcCallback.onConnectTimeout()

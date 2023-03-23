@@ -41,12 +41,12 @@ class ScanActivity : AppCompatActivity() {
         scanResultView?.adapter = adapter
 
         setSupportActionBar(findViewById(R.id.main_toolbar))
-        requestBLEPermissions()
+        BluetoothPermissions.requestBLEPermissions(this)
     }
 
     override fun onResume() {
         super.onResume()
-        clearScanResults()
+        //clearScanResults()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -81,49 +81,21 @@ class ScanActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun requestBLEPermissions() {
-        ActivityCompat.requestPermissions(
-            this@ScanActivity,
-            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), FINE_LOCATION_PERMISSION_REQUEST
-        )
-    }
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
-            FINE_LOCATION_PERMISSION_REQUEST -> {
+            BluetoothPermissions.FINE_LOCATION_PERMISSION_REQUEST -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     this.startScan()
                 } else {
-                    showPermissionsInfo()
+                    BluetoothPermissions.showPermissionsInfo(this)
                 }
                 return
             }
         }
-    }
-
-    private fun checkBLEPermissions(): Boolean {
-        val permission = Manifest.permission.ACCESS_FINE_LOCATION
-        val res: Int = checkCallingOrSelfPermission(permission)
-        val granted = res == PackageManager.PERMISSION_GRANTED
-        if (!granted) showPermissionsInfo()
-        return granted
-    }
-
-    private fun showPermissionsInfo() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle(R.string.permission_dialog_title)
-        builder.setMessage(R.string.permission_dialog_text)
-        builder.setPositiveButton(R.string.dialog_confirm) { dialog, which ->
-            requestBLEPermissions()
-        }
-        builder.setNegativeButton(R.string.dialog_no) { dialog, which ->
-            dialog.cancel()
-        }
-        builder.show()
     }
 
     private fun promptEnableBluetooth() {
@@ -132,7 +104,7 @@ class ScanActivity : AppCompatActivity() {
     }
 
     private fun startScan() {
-        if (!checkBLEPermissions()) return
+        if (!BluetoothPermissions.checkBLEPermissions(this)) return
         clearScanResults()
         setScanningUI()
         try {
@@ -191,7 +163,6 @@ class ScanActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val FINE_LOCATION_PERMISSION_REQUEST = 1001
         private const val TAG = "ScanActivity"
     }
 }
