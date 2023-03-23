@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.lohmegalog.R
 import com.example.lohmegalog.bbBluetooth.BlueBerryBluetoothDiscoverer
 
-class MainActivity : AppCompatActivity() {
+class ScanActivity : AppCompatActivity() {
     private var scanResultView: RecyclerView? = null
     private var progressBar: ProgressBar? = null
     private var stopScanButton: MenuItem? = null
@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_scan)
 
         progressBar = findViewById(R.id.progress)
         scanResultView = findViewById(R.id.scan_result_view)
@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
+        menuInflater.inflate(R.menu.menu_scan, menu)
         stopScanButton = menu?.findItem(R.id.action_stopscan)
         rescanButton = menu?.findItem(R.id.action_rescan)
         setStopUI()
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun requestBLEPermissions() {
         ActivityCompat.requestPermissions(
-            this@MainActivity,
+            this@ScanActivity,
             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), FINE_LOCATION_PERMISSION_REQUEST
         )
     }
