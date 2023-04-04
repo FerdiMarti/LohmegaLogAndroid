@@ -144,8 +144,8 @@ class DeviceActivity : AppCompatActivity() {
 
     private fun connectToDevice(deviceAddress: String?) {
         //Check permissions again
-        if (!BluetoothPermissions.checkBLEPermissions(this)) {
-            BluetoothPermissions.showPermissionsInfo(this)
+        if (!BluetoothPermissions.checkPermission(this)) {
+            BluetoothPermissions.showPermissionInfo(this)
         }
 
         if (deviceAddress == null) {

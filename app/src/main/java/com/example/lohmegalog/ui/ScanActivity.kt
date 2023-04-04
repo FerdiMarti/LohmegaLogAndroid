@@ -1,6 +1,5 @@
 package com.example.lohmegalog.ui
 
-import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -9,8 +8,8 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.lohmegalog.R
@@ -42,7 +41,7 @@ class ScanActivity : AppCompatActivity() {
         scanResultView?.adapter = adapter
 
         setSupportActionBar(findViewById(R.id.main_toolbar))
-        BluetoothPermissions.requestBLEPermissions(this)
+        BluetoothPermissions.requestPermission(this)
     }
 
     override fun onResume() {
@@ -82,19 +81,19 @@ class ScanActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    //Callback for requesting location permission
+    //Callback for requesting permission
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
-            BluetoothPermissions.FINE_LOCATION_PERMISSION_REQUEST -> {
+            BluetoothPermissions.PERMISSION_REQUEST -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     this.startScan()
                 } else {
                     //show info if permission denied
-                    BluetoothPermissions.showPermissionsInfo(this)
+                    BluetoothPermissions.showPermissionInfo(this)
                 }
                 return
             }
@@ -102,12 +101,19 @@ class ScanActivity : AppCompatActivity() {
     }
 
     private fun promptEnableBluetooth() {
-        val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-        ActivityCompat.startActivityForResult(this, enableBtIntent, 1, null)
+        runOnUiThread {
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle(R.string.info_dialog_title)
+            builder.setMessage(R.string.prompt_enable_bluetooth)
+            builder.setPositiveButton(R.string.dialog_confirm) { dialog, which ->
+                dialog.cancel()
+            }
+            builder.show()
+        }
     }
 
     private fun startScan() {
-        if (!BluetoothPermissions.checkBLEPermissions(this)) return
+        if (!BluetoothPermissions.checkPermission(this)) return
         clearScanResults()
         setScanningUI()
         try {
