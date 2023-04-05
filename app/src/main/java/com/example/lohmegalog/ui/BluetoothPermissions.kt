@@ -61,7 +61,7 @@ class BluetoothPermissions {
         private fun requestBLEPermission(context: Activity) {
             ActivityCompat.requestPermissions(
                 context,
-                arrayOf(Manifest.permission.BLUETOOTH_SCAN),
+                arrayOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT),
                 PERMISSION_REQUEST
             )
         }

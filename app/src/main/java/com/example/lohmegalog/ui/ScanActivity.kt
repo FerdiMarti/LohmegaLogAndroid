@@ -89,13 +89,17 @@ class ScanActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             BluetoothPermissions.PERMISSION_REQUEST -> {
-                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    this.startScan()
-                } else {
-                    //show info if permission denied
-                    BluetoothPermissions.showPermissionInfo(this)
+                if (grantResults.isEmpty()) return
+
+                for (result in grantResults) {
+                    if (result != PackageManager.PERMISSION_GRANTED) {
+                        //show info if permission denied
+                        BluetoothPermissions.showPermissionInfo(this)
+                        return
+                    }
                 }
-                return
+
+                this.startScan()
             }
         }
     }
